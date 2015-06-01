@@ -1,0 +1,91 @@
+TEST CASES
+----------
+メロディー		merodī
+がっこう			gakkō
+セーラー			sērā
+ぬれ|えん			nureen
+おねえさん		onēsan
+こ|おどり			koodori
+こおり			kōri
+まよ|う			mayou
+とうきょう		tōkyō
+パーティー		pātī
+スーパーマン		sūpāman
+しんよう			shin'yō
+かんい			kan'i
+こっち			kotchi
+まっちゃ			matcha
+みっつ			mittsu
+
+
+
+bugs:
+- small kana are considered to be "not pure vowels". doesn't affect anything
+though.
+
+- occasionally there are words that have a katakana small tsu in front of a
+hiragana character. these probably aren't picked up on right now. this needs
+a test case.
+
+
+remember to add the small vowels to the regex!!!
+メロディー = merodī
+
+
+ALSO:
+[ ] The capital characters ĀĪŪĒŌ are unused. (Note in readme)
+[ ] test weird edge cases
+[ ] change all examples to katakana in comments/docstr
+[ ] add ヮゎ
+[ ] test with 3.4
+
+add the ability to get 'integrated' kana+romaji, eg.
+
+がっこう = が(ga)っこう(kkō)
+セーラー = セー(sē)ラー(rā)
+
+and add ability to supply a custom replacement string
+
+RULES TO IMPLEMENT:
+
+the last 'uu' is never converted to ū if it's the end of a string
+
+implement the word border, e.g.
+ぬれ|えん = nureen
+おねえさん = onēsan
+こ|おどり = koodori
+こおり = kōri
+食う = kuu
+
+we can generate these word borders by getting a kanji + kana version of a word.
+
+The combination o + u is written ou if a word-border exists between them or it is the end part of terminal form of a verb:
+まよ|う = mayou
+こ|うま = kouma
+がっこう = gakkō
+とうきょう = tōkyō
+
+The long vowels within loanwords are indicated by macrons (ā, ī, ū, ē, ō) as follows:
+セーラー = sērā
+パーティー = pātī
+ヒーター = hītā
+レーナ = rēna
+タクシー = takushī
+スーパーマン = sūpāman
+
+
+n before labial consonants = 'n\'' before vowels and y, e.g.
+ぐんま = gunma
+かんい = kan'i
+しんよう = shin'yō
+
+special case: っち:
+こっち = kotchi, NOT kocchi
+まっちゃ = matcha, NOT maccha
+みっつ = mittsu
+
+
+also:
+When he へ is used as a particle, it is written e.
+When wo を is used as a particle, it is written o.
+probably irrelevant as we don't have the information on what a particle is.
