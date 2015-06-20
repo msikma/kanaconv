@@ -20,8 +20,8 @@ that don't normally occur in Japanese.
 commits.**
 
 
-Example
--------
+Examples
+--------
 
 Some example conversions are listed below:
 
