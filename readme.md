@@ -92,32 +92,28 @@ conv.to_romaji(u'こ|うま')　　　　# u'kouma' - correct
 The following full Unicode blocks are supported in this module:
 
 <p align="center">
-
-[Katakana Unicode Block](http://en.wikipedia.org/wiki/Katakana)
-
+Katakana Unicode Block
 </p>
 
-　　　　　　　０　１　２　３　４　５　６　７　８　９　Ａ　Ｂ　Ｃ　Ｄ　Ｅ　Ｆ
-Ｕ＋３０Ａｘ　゠　ァ　ア　ィ　イ　ゥ　ウ　ェ　エ　ォ　オ　カ　ガ　キ　ギ　ク
-Ｕ＋３０Ｂｘ　グ　ケ　ゲ　コ　ゴ　サ　ザ　シ　ジ　ス　ズ　セ　ゼ　ソ　ゾ　タ
-Ｕ＋３０Ｃｘ　ダ　チ　ヂ　ッ　ツ　ヅ　テ　デ　ト　ド　ナ　ニ　ヌ　ネ　ノ　ハ
-Ｕ＋３０Ｄｘ　バ　パ　ヒ　ビ　ピ　フ　ブ　プ　ヘ　ベ　ペ　ホ　ボ　ポ　マ　ミ
-Ｕ＋３０Ｅｘ　ム　メ　モ　ャ　ヤ　ュ　ユ　ョ　ヨ　ラ　リ　ル　レ　ロ　ヮ　ワ
-Ｕ＋３０Ｆｘ　ヰ　ヱ　ヲ　ン　ヴ　ヵ　ヶ　ヷ　ヸ　ヹ　ヺ　・　ー　ヽ　ヾ　ヿ
+　　　　　　　０　１　２　３　４　５　６　７　８　９　Ａ　Ｂ　Ｃ　Ｄ　Ｅ　Ｆ  
+Ｕ＋３０Ａｘ　゠　ァ　ア　ィ　イ　ゥ　ウ　ェ　エ　ォ　オ　カ　ガ　キ　ギ　ク  
+Ｕ＋３０Ｂｘ　グ　ケ　ゲ　コ　ゴ　サ　ザ　シ　ジ　ス　ズ　セ　ゼ　ソ　ゾ　タ  
+Ｕ＋３０Ｃｘ　ダ　チ　ヂ　ッ　ツ　ヅ　テ　デ　ト　ド　ナ　ニ　ヌ　ネ　ノ　ハ  
+Ｕ＋３０Ｄｘ　バ　パ　ヒ　ビ　ピ　フ　ブ　プ　ヘ　ベ　ペ　ホ　ボ　ポ　マ　ミ  
+Ｕ＋３０Ｅｘ　ム　メ　モ　ャ　ヤ　ュ　ユ　ョ　ヨ　ラ　リ　ル　レ　ロ　ヮ　ワ  
+Ｕ＋３０Ｆｘ　ヰ　ヱ　ヲ　ン　ヴ　ヵ　ヶ　ヷ　ヸ　ヹ　ヺ　・　ー　ヽ　ヾ　ヿ  
 
 <p align="center">
-
-[Hiragana Unicode Block](http://en.wikipedia.org/wiki/Hiragana)
-
+Hiragana Unicode Block
 </p>
 
-　　　　　　　０　１　２　３　４　５　６　７　８　９　Ａ　Ｂ　Ｃ　Ｄ　Ｅ　Ｆ
-Ｕ＋３０４ｘ　　　ぁ　あ　ぃ　い　ぅ　う　ぇ　え　ぉ　お　か　が　き　ぎ　く
-Ｕ＋３０５ｘ　ぐ　け　げ　こ　ご　さ　ざ　し　じ　す　ず　せ　ぜ　そ　ぞ　た
-Ｕ＋３０６ｘ　だ　ち　ぢ　っ　つ　づ　て　で　と　ど　な　に　ぬ　ね　の　は
-Ｕ＋３０７ｘ　ば　ぱ　ひ　び　ぴ　ふ　ぶ　ぷ　へ　べ　ぺ　ほ　ぼ　ぽ　ま　み
-Ｕ＋３０８ｘ　む　め　も　ゃ　や　ゅ　ゆ　ょ　よ　ら　り　る　れ　ろ　ゎ　わ
-Ｕ＋３０９ｘ　ゐ　ゑ　を　ん　ゔ　ゕ　ゖ　　　　　゙　゚　゛　゜　ゝ　ゞ　ゟ
+　　　　　　　０　１　２　３　４　５　６　７　８　９　Ａ　Ｂ　Ｃ　Ｄ　Ｅ　Ｆ  
+Ｕ＋３０４ｘ　　　ぁ　あ　ぃ　い　ぅ　う　ぇ　え　ぉ　お　か　が　き　ぎ　く  
+Ｕ＋３０５ｘ　ぐ　け　げ　こ　ご　さ　ざ　し　じ　す　ず　せ　ぜ　そ　ぞ　た  
+Ｕ＋３０６ｘ　だ　ち　ぢ　っ　つ　づ　て　で　と　ど　な　に　ぬ　ね　の　は  
+Ｕ＋３０７ｘ　ば　ぱ　ひ　び　ぴ　ふ　ぶ　ぷ　へ　べ　ぺ　ほ　ぼ　ぽ　ま　み  
+Ｕ＋３０８ｘ　む　め　も　ゃ　や　ゅ　ゆ　ょ　よ　ら　り　る　れ　ろ　ゎ　わ  
+Ｕ＋３０９ｘ　ゐ　ゑ　を　ん　ゔ　ゕ　ゖ　　　　　゙　゚　゛　゜　ゝ　ゞ　ゟ  
 
 There are a number of other blocks for e.g. half-width characters and other
 rare glyphs, but none of them are supported.
