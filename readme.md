@@ -5,7 +5,7 @@ KanaConv
 transliteration rules.**
 
 <p align="center">
-とうきょう → tōkyō
+とうきょう → tōkyō　　パーティー → pātī
 </p>
 
 For a full overview of the rules by which this module operates, see [the
@@ -92,7 +92,9 @@ conv.to_romaji(u'こ|うま')　　　　# u'kouma' - correct
 The following full Unicode blocks are supported in this module:
 
 <p align="center">
+
 [Katakana Unicode Block](http://en.wikipedia.org/wiki/Katakana)
+
 </p>
 
 　　　　　　　０　１　２　３　４　５　６　７　８　９　Ａ　Ｂ　Ｃ　Ｄ　Ｅ　Ｆ
@@ -104,7 +106,9 @@ The following full Unicode blocks are supported in this module:
 Ｕ＋３０Ｆｘ　ヰ　ヱ　ヲ　ン　ヴ　ヵ　ヶ　ヷ　ヸ　ヹ　ヺ　・　ー　ヽ　ヾ　ヿ
 
 <p align="center">
+
 [Hiragana Unicode Block](http://en.wikipedia.org/wiki/Hiragana)
+
 </p>
 
 　　　　　　　０　１　２　３　４　５　６　７　８　９　Ａ　Ｂ　Ｃ　Ｄ　Ｅ　Ｆ
