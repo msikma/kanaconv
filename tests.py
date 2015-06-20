@@ -3,12 +3,12 @@
 #
 # (C) 2015, MIT License
 
-from kanaconv.converter import KanaConverter
+from kanaconv.converter import KanaConv
 import unittest
 
 
 # Initialize the KanaConverter.
-conv = KanaConverter()
+conv = KanaConv()
 
 
 class TestKanaConverter(unittest.TestCase):

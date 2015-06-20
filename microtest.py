@@ -3,8 +3,8 @@
 #
 # (C) 2015, MIT License
 
-from kanaconv.converter import KanaConverter
-conv = KanaConverter()
+from kanaconv.converter import KanaConv
+conv = KanaConv()
 tests = [
     (u'メロディー', u'merodī'),
     (u'セーラー', u'sērā'),

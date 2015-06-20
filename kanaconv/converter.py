@@ -69,7 +69,7 @@ WORD_SEPARATOR = '|'      # word boundary, e.g. 仔馬 = こ|うま = kouma, not
 PARTICLE_INDICATOR = '.'  # indicates a particle, e.g. わたし.は = watashi wa.
 
 
-class KanaConverter(object):
+class KanaConv(object):
     '''
     The main converter class. After initialization, use to_romaji()
     to convert a kana string to rōmaji.
