@@ -177,13 +177,15 @@ romaji = {
     ],
     # Replacement character for impossible geminate marker combinations
     'repl_char': '-',
-    # First characters of digraphs
+    # First characters of digraphs (only the consonants are needed)
+    # todo: implement
     'set_di1': [
-        # todo
+        'ky', 'sh', 'ch', 'hy', 'my', 'ry', 'ny'
+        'gy', 'j', 'dy', 'by', 'my', 'ry', 'py'
     ],
     # Second characters of digraphs
     'set_di2': [
-        # todo
+        ('a', 'ā'), ('u', 'ū'), ('o', 'ō')
     ]
 }
 

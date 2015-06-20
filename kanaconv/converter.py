@@ -67,17 +67,18 @@ EMPTY_BUFFER = 10
 END_CHAR = 11
 CV = 12
 VOWEL = 13
+XVOWEL = 14
 # Strategies for dealing with unknown characters.
-UNKNOWN_DELETE = 14
-UNKNOWN_RAISE = 15
-UNKNOWN_INCLUDE = 16
+UNKNOWN_DELETE = 15
+UNKNOWN_RAISE = 16
+UNKNOWN_INCLUDE = 17
 
 # The replacement character for impossible geminate marker combinations.
-# E.g. っえ becomes -e.
+# E.g. っえ becomes -e. todo: implement
 REPL_CHAR = romaji['repl_char']
 
 # The valid character types.
-CHAR_TYPES = {CV, VOWEL}
+CHAR_TYPES = {CV, VOWEL, XVOWEL}
 
 # Two special characters that change the machine's behavior.
 WORD_BORDER = '|'      # word boundary, e.g. 子馬 = こ|うま = kouma, not kōma.
@@ -110,12 +111,11 @@ class KanaConv(object):
         self.geminate_count = 0
 
         # The currently active rōmaji vowel character.
-        self.active_vowel = None
         self.active_vowel_info = None
         self.active_vowel_ro = None
 
         # The currently active small vowel character.
-        self.active_xvowel = None
+        self.has_xvowel = False
         self.active_xvowel_info = None
 
         # The currently active character.
@@ -149,6 +149,7 @@ class KanaConv(object):
         ト, plus a geminate marker and a long vowel marker, this causes
         the characters "ttō" to be added to the output.
         '''
+        print('    flush char')
         if self.active_char is None:
             # Ignore in case there's no active character, only at the very
             # beginning of the conversion process.
@@ -162,7 +163,7 @@ class KanaConv(object):
         lvm = self.lvmarker_count
 
         # Check whether we're dealing with a valid char type.
-        if not char_type in CHAR_TYPES:
+        if char_type not in CHAR_TYPES:
             raise InvalidCharacterTypeError
 
         # If no modifiers are active (geminate marker, small vowel marker,
@@ -207,7 +208,7 @@ class KanaConv(object):
                 char_main = char_cons + char_lv * lvm if lvm > 0 else char_ro
                 self.append_to_stack(gem_cons + char_main)
 
-        if char_type == VOWEL:
+        if char_type == VOWEL or char_type == XVOWEL:
             char_lv = char_info[1]  # the long vowel part
 
             if xv is not None:
@@ -229,6 +230,7 @@ class KanaConv(object):
         '''
         Appends a string to the output stack.
         '''
+        print('      append: %s' % string)
         self.stack.append(string)
 
     def get_unknown_chars(self):
@@ -244,10 +246,9 @@ class KanaConv(object):
         if state == EMPTY_BUFFER:
             self.lvmarker_count = 0
             self.geminate_count = 0
-            self.active_vowel = None
             self.active_vowel_info = None
             self.active_vowel_ro = None
-            self.active_xvowel = None
+            self.has_xvowel = False
             self.active_xvowel_info = None
             self.active_char = None
             self.active_char_info = None
@@ -268,6 +269,8 @@ class KanaConv(object):
         self.active_char = char
         self.active_char_type = type
 
+        print('  char: %s' % char)
+
         if type == CV:
             self.active_char_info = cv_lt[char]
             self.active_vowel_ro = cv_lt[char][3]
@@ -275,6 +278,10 @@ class KanaConv(object):
         if type == VOWEL:
             self.active_char_info = vowel_lt[char]
             self.active_vowel_ro = vowel_lt[char][0]
+
+        if type == XVOWEL:
+            self.active_char_info = xvowel_lt[char]
+            self.active_vowel_ro = xvowel_lt[char][0]
 
     def set_vowel(self, vowel):
         '''
@@ -287,25 +294,36 @@ class KanaConv(object):
         Hence, either we increment the long vowel marker count, or we
         flush the current character and set the active character to this.
         '''
-        self.active_vowel = vowel
-        self.active_vowel_info = vowel_lt[vowel]
-
-        if self.active_vowel_info[0] == self.active_vowel_ro:
+        if vowel_lt[vowel][0] == self.active_vowel_ro:
             # Same vowel as the one that's currently active.
             self.inc_lvmarker()
         else:
             # Not the same, so flush the active character and continue.
-            self.active_vowel_ro = self.active_vowel_info[0]
-            self.flush_char()
             self.set_char(vowel, VOWEL)
-
 
     def set_xvowel(self, xvowel):
         '''
         Sets the currently active small vowel, e.g. ァ.
+
+        If an active small vowel has already been set (which doesn't occur in
+        dictionary words), the current character must be flushed. After that,
+        we'll set the current character to this small vowel; in essence,
+        it will act like a regular size vowel.
         '''
-        self.active_xvowel = xvowel
-        self.active_xvowel_info = xvowel_lt[xvowel]
+        if self.has_xvowel is True:
+            print('  has xvowel')
+            if self.active_xvowel_info[0] == self.active_vowel_ro:
+                # Same vowel as the one that's currently active.
+                # todo: test
+                self.inc_lvmarker()
+            else:
+                # Not the same, so flush the active character and continue.
+                self.active_vowel_ro = self.active_xvowel_info[0]
+                self.set_char(xvowel, XVOWEL)
+        else:
+            self.active_xvowel_info = xvowel_lt[xvowel]
+
+        self.has_xvowel = True
 
     def inc_geminate(self):
         '''
@@ -314,12 +332,18 @@ class KanaConv(object):
         '''
         if self.active_char is not None:
             self.flush_char()
+
         self.geminate_count += 1
 
     def inc_lvmarker(self):
         '''
         Increments the long vowel marker count.
         '''
+        # Ignore the long vowel marker in case it occurs before any
+        # characters that it can affect.
+        if self.active_char is None:
+            return
+
         self.lvmarker_count += 1
 
     def flush_stack(self):
@@ -338,23 +362,29 @@ class KanaConv(object):
         chars = list(input)
         chars.append(END_CHAR)
         for char in chars:
+            print('char: %s' % char)
             if char in cvs:
+                print('set_char(%s, %s)' % (char, CV))
                 self.set_char(char, CV)
                 continue
 
             if char in vowels:
+                print('set_vowel(%s)' % (char))
                 self.set_vowel(char)
                 continue
 
             if char in xvowels:
+                print('set_xvowel(%s)' % (char))
                 self.set_xvowel(char)
                 continue
 
             if char in geminates:
+                print('inc_geminate()')
                 self.inc_geminate()
                 continue
 
             if char == lvmarker:
+                print('inc_lvmarker()')
                 self.inc_lvmarker()
                 continue
 
