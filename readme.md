@@ -8,6 +8,10 @@ transliteration rules.**
 とうきょう → tōkyō
 </p>
 
+For a full overview of the rules by which this module operates, see [the
+Wikipedia page on Hepburn romanization](https://en.wikipedia
+.org/wiki/Hepburn_romanization).
+
 The converter is built as a finite state machine and attempts to convert
 any input to a sensible output even if character combinations are used
 that don't normally occur in Japanese.
@@ -32,6 +36,7 @@ conv.to_romaji(u'こおり')　　　　 # u'kōri',
 conv.to_romaji(u'スーパーマン')　 # u'sūpāman'
 conv.to_romaji(u'とうきょう')　　 # u'tōkyō'
 conv.to_romaji(u'パーティー')　　 # u'pātī'
+conv.to_romaji(u'ぬれ|えん')　　　# u'nureen' (see section on word borders)
 ```
 
 
@@ -60,6 +65,27 @@ with a real-life use case:
 * "Data" sign (🈓; U+1F213)
 * Rare typographical symbols
 * Vertical-only symbols
+
+### Word borders
+
+Generally, combinations such as *o + u* are transliterated with a macron
+character, e.g. *ō*. This is not the case when there is a word border
+between the two vowels.
+
+For example, the word 子（こ）馬（うま）has the *o + u* vowels split across
+two separate words. Hence, no long vowel is pronounced, and the correct
+transliteration is *kouma*.
+
+Since the module does not have an internal dictionary, it can't know that
+こうま is split across two words in such a way. In order to get a correct
+transliteration, you need to manually add a pipe character to the input,
+e.g. こ|うま:
+
+```python
+# transliteration of 子馬
+conv.to_romaji(u'こうま')　　　　 # u'kōma'  - incorrect
+conv.to_romaji(u'こ|うま')　　　　# u'kouma' - correct
+```
 
 ### Unicode blocks
 
@@ -100,9 +126,11 @@ More info on the supported typographic symbols can be found
 
 A lot of katakana loan words have English equivalents, but this module will
 only return transliterated rōmaji. For example, パーティー is transliterated to
-"pātī", whereas the English term is "party". The use of an internal dictionary
-to handle these word replacements is considered to be out of scope for this
-project.
+"pātī", whereas the English term is "party".
+
+The use of an internal dictionary to handle these word replacements is
+considered to be out of scope for this project. Additionally, proper names
+like Tōkyō are not capitalized for the same reason.
 
 
 License
