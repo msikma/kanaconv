@@ -139,6 +139,13 @@ The use of an internal dictionary to handle these word replacements is
 considered to be out of scope for this project. Additionally, proper names
 like Tōkyō are not capitalized for the same reason.
 
+### Unusual combinations and edge cases
+
+This module will attempt to create sensible output even in the case of
+unusual character combinations that normally don't occur in a dictionary.
+
+**TODO: add a good example here.**
+
 
 License
 -------

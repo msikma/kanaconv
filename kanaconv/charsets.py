@@ -115,42 +115,57 @@ romaji = {
     #    1) the plain character;
     #    2) the added consonant in case of a geminate marker prefix;
     #    3) the consonant-only part of the character;
-    #    4) the long vowel.
+    #    4) the vowel;
+    #    5) the long version of the vowel.
     #
     # They're used in the following ways, e.g. for チ ('chi', 't', 'ch', u'ī'):
     #
-    #    チ　　　　[1]               chi
-    #    ッチ　　　[2] + [1]         tchi
-    #    チャ　　　[3] + [x]         cha (plus a vowel from the ャ character)
-    #    ッチャ　　[2] + [3] + [x]   tcha
-    #    ッチー　　[2] + [3] + [4]   tchī
+    #    チ　　　　[0]               chi
+    #    ッチ　　　[1] + [0]         tchi
+    #    チャ　　　[2] + [x]         cha (plus a vowel from the ャ character)
+    #    ッチャ　　[1] + [2] + [x]   tcha
+    #    ッチー　　[1] + [2] + [4]   tchī
     #
-    # The macron characters āīūēō are used for long vowels.
+    # The macron characters āīūēō are used for long vowels. The same order
+    # is used as for the katakana and hiragana lists.
+    #
+    # The 'n' is a special case, and it's kept here for ease of processing.
     'set_cvs': [
-        ('ka', 'k', 'k', u'ā'), ('ki', 'k', 'k', u'ī'), ('ku', 'k', 'k', u'ū'),
-        ('ke', 'k', 'k', u'ē'), ('ko', 'k', 'k', u'ō'), ('sa', 's', 's', u'ā'),
-        ('shi', 's', 'sh', u'ī'), ('su', 's', 's', u'ū'),
-        ('se', 's', 's', u'ē'), ('so', 's', 's', u'ō'), ('ta', 't', 't', u'ā'),
-        ('chi', 't', 'ch', u'ī'), ('tsu', 't', 'ts', u'ū'),
-        ('te', 't', 't', u'ē'), ('to', 't', 't', u'ō'), ('na', 'n', 'n', u'ā'),
-        ('ni', 'n', 'n', u'ī'), ('nu', 'n', 'n', u'ū'), ('ne', 'n', 'n', u'ē'),
-        ('no', 'n', 'n', u'ō'), ('ha', 'h', 'h', u'ā'), ('hi', 'h', 'h', u'ī'),
-        ('fu', 'f', 'f', u'ū'), ('he', 'h', 'h', u'ē'), ('ho', 'h', 'h', u'ō'),
-        ('ma', 'm', 'm', u'ā'), ('mi', 'm', 'm', u'ī'), ('mu', 'm', 'm', u'ū'),
-        ('me', 'm', 'm', u'ē'), ('mo', 'm', 'm', u'ō'), ('ya', 'y', 'y', u'ā'),
-        ('yu', 'y', 'y', u'ū'), ('yo', 'y', 'y', u'ō'), ('ra', 'r', 'r', u'ā'),
-        ('ri', 'r', 'r', u'ī'), ('ru', 'r', 'r', u'ū'), ('re', 'r', 'r', u'ē'),
-        ('ro', 'r', 'r', u'ō'), ('wa', 'w', 'w', u'ā'), ('wo', 'w', 'w', u'ō'),
-        ('wi', 'w', 'w', u'ī'), ('we', 'w', 'w', u'ē'), ('n', 'n', 'n', 'n'),
-        ('ka', 'k', 'k', u'ā'), ('ka', 'k', 'k', u'ā'), ('ga', 'g', 'g', u'ā'),
-        ('gi', 'g', 'g', u'ī'), ('gu', 'g', 'g', u'ū'), ('ge', 'g', 'g', u'ē'),
-        ('go', 'g', 'g', u'ō'), ('za', 'z', 'z', u'ā'), ('ji', 'j', 'j', u'ī'),
-        ('zu', 'z', 'z', u'ū'), ('ze', 'z', 'z', u'ē'), ('zo', 'z', 'z', u'ō'),
-        ('da', 'd', 'd', u'ā'), ('ji', 'j', 'j', u'ī'), ('zu', 'z', 'z', u'ū'),
-        ('de', 'd', 'd', u'ē'), ('do', 'd', 'd', u'ō'), ('ba', 'b', 'b', u'ā'),
-        ('bi', 'b', 'b', u'ī'), ('bu', 'b', 'b', u'ū'), ('be', 'b', 'b', u'ē'),
-        ('bo', 'b', 'b', u'ō'), ('pa', 'p', 'p', u'ā'), ('pi', 'p', 'p', u'ī'),
-        ('pu', 'p', 'p', u'ū'), ('pe', 'p', 'p', u'ē'), ('po', 'p', 'p', u'ō')
+        ('ka', 'k', 'k', 'a', u'ā'), ('ki', 'k', 'k', 'i', u'ī'),
+        ('ku', 'k', 'k', 'u', u'ū'), ('ke', 'k', 'k', 'e', u'ē'),
+        ('ko', 'k', 'k', 'o', u'ō'), ('sa', 's', 's', 'a', u'ā'),
+        ('shi', 's', 'sh', 'i', u'ī'), ('su', 's', 's', 'u', u'ū'),
+        ('se', 's', 's', 'e', u'ē'), ('so', 's', 's', 'o', u'ō'),
+        ('ta', 't', 't', 'a', u'ā'), ('chi', 't', 'ch', 'i', u'ī'),
+        ('tsu', 't', 'ts', 'u', u'ū'), ('te', 't', 't', 'e', u'ē'),
+        ('to', 't', 't', 'o', u'ō'), ('na', 'n', 'n', 'a', u'ā'),
+        ('ni', 'n', 'n', 'i', u'ī'), ('nu', 'n', 'n', 'u', u'ū'),
+        ('ne', 'n', 'n', 'e', u'ē'), ('no', 'n', 'n', 'o', u'ō'),
+        ('ha', 'h', 'h', 'a', u'ā'), ('hi', 'h', 'h', 'i', u'ī'),
+        ('fu', 'f', 'f', 'u', u'ū'), ('he', 'h', 'h', 'e', u'ē'),
+        ('ho', 'h', 'h', 'o', u'ō'), ('ma', 'm', 'm', 'a', u'ā'),
+        ('mi', 'm', 'm', 'i', u'ī'), ('mu', 'm', 'm', 'u', u'ū'),
+        ('me', 'm', 'm', 'e', u'ē'), ('mo', 'm', 'm', 'o', u'ō'),
+        ('ya', 'y', 'y', 'a', u'ā'), ('yu', 'y', 'y', 'u', u'ū'),
+        ('yo', 'y', 'y', 'o', u'ō'), ('ra', 'r', 'r', 'a', u'ā'),
+        ('ri', 'r', 'r', 'i', u'ī'), ('ru', 'r', 'r', 'u', u'ū'),
+        ('re', 'r', 'r', 'e', u'ē'), ('ro', 'r', 'r', 'o', u'ō'),
+        ('wa', 'w', 'w', 'a', u'ā'), ('wo', 'w', 'w', 'o', u'ō'),
+        ('wi', 'w', 'w', 'i', u'ī'), ('we', 'w', 'w', 'e', u'ē'),
+        ('n', 'n', 'n', 'n', 'n'), ('ka', 'k', 'k', 'a', u'ā'),
+        ('ka', 'k', 'k', 'a', u'ā'), ('ga', 'g', 'g', 'a', u'ā'),
+        ('gi', 'g', 'g', 'i', u'ī'), ('gu', 'g', 'g', 'u', u'ū'),
+        ('ge', 'g', 'g', 'e', u'ē'), ('go', 'g', 'g', 'o', u'ō'),
+        ('za', 'z', 'z', 'a', u'ā'), ('ji', 'j', 'j', 'i', u'ī'),
+        ('zu', 'z', 'z', 'u', u'ū'), ('ze', 'z', 'z', 'e', u'ē'),
+        ('zo', 'z', 'z', 'o', u'ō'), ('da', 'd', 'd', 'a', u'ā'),
+        ('ji', 'j', 'j', 'i', u'ī'), ('zu', 'z', 'z', 'u', u'ū'),
+        ('de', 'd', 'd', 'e', u'ē'), ('do', 'd', 'd', 'o', u'ō'),
+        ('ba', 'b', 'b', 'a', u'ā'), ('bi', 'b', 'b', 'i', u'ī'),
+        ('bu', 'b', 'b', 'u', u'ū'), ('be', 'b', 'b', 'e', u'ē'),
+        ('bo', 'b', 'b', 'o', u'ō'), ('pa', 'p', 'p', 'a', u'ā'),
+        ('pi', 'p', 'p', 'i', u'ī'), ('pu', 'p', 'p', 'u', u'ū'),
+        ('pe', 'p', 'p', 'e', u'ē'), ('po', 'p', 'p', 'o', u'ō')
     ],
     # Regular vowels
     'set_vowels': [
@@ -160,6 +175,8 @@ romaji = {
     'set_xvowels': [
         ('a', u'ā'), ('i', u'ī'), ('u', u'ū'), ('e', u'ē'), ('o', u'ō')
     ],
+    # Replacement character for impossible geminate marker combinations
+    'repl_char': '-',
     # First characters of digraphs
     'set_di1': [
         # todo
