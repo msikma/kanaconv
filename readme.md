@@ -36,7 +36,7 @@ conv.to_romaji(u'こおり')　　　　 # u'kōri',
 conv.to_romaji(u'スーパーマン')　 # u'sūpāman'
 conv.to_romaji(u'とうきょう')　　 # u'tōkyō'
 conv.to_romaji(u'パーティー')　　 # u'pātī'
-conv.to_romaji(u'ぬれ|えん')　　　# u'nureen' (see section on word borders)
+conv.to_romaji(u'ぬれ|えん')　　　# u'nureen' (濡れ縁; see section on word borders)
 ```
 
 
