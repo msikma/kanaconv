@@ -87,6 +87,9 @@ conv.to_romaji(u'こうま')　　　　 # u'kōma'  - incorrect
 conv.to_romaji(u'こ|うま')　　　　# u'kouma' - correct
 ```
 
+This rule applies to the combinations *a + a*, *u + u*, *e + e*, *o + o*,
+and *o + u*. All other combinations of vowels are always written separately.
+
 ### Unicode blocks
 
 The following full Unicode blocks are supported in this module:
