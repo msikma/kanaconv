@@ -359,7 +359,7 @@ class KanaConv(object):
                 continue
 
             if char == WORD_BORDER:
-                # When stumbling upon a word border, e.g. ぬれ|えん,
+                # When stumbling upon a word border, e.g. in ぬれ|えん,
                 # the current word has finished, meaning the character
                 # should be flushed.
                 self.flush_char()
