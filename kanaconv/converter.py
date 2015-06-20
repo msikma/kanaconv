@@ -241,7 +241,7 @@ class KanaConv(object):
         '''
         Resets the machine to a specific base state.
         '''
-        if state is EMPTY_BUFFER:
+        if state == EMPTY_BUFFER:
             self.lvmarker_count = 0
             self.geminate_count = 0
             self.active_vowel = None
@@ -365,7 +365,7 @@ class KanaConv(object):
                 self.flush_char()
                 continue
 
-            if char is END_CHAR:
+            if char == END_CHAR:
                 self.flush_char()
                 continue
 
