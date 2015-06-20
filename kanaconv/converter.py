@@ -56,10 +56,22 @@ xvowels_katakana = katakana['set_xvowels']
 xvowels_hiragana = hiragana['set_xvowels']
 xvowel_lt = kana_romaji_lt(xvowels_romaji, xvowels_katakana, xvowels_hiragana)
 
+# Lookup table for digraph kana.
+di_a_romaji = romaji['set_digraphs_a']
+di_b_romaji = romaji['set_digraphs_b']
+di_a_katakana = katakana['set_digraphs_a']
+di_b_katakana = katakana['set_digraphs_b']
+di_a_hiragana = hiragana['set_digraphs_a']
+di_b_hiragana = hiragana['set_digraphs_b']
+di_a_lt = kana_romaji_lt(di_a_romaji, di_a_katakana, di_a_hiragana)
+di_b_lt = kana_romaji_lt(di_b_romaji, di_b_katakana, di_b_hiragana)
+
 # We use sets to be able to do quick lookups.
 cvs = set(cv_lt)
 vowels = set(vowel_lt)
 xvowels = set(xvowel_lt)
+di_a = set(di_a_lt)
+di_b = set(di_b_lt)
 geminates = {katakana['geminate'], hiragana['geminate']}
 
 # The machine's constants.
@@ -81,7 +93,7 @@ REPL_CHAR = romaji['repl_char']
 CHAR_TYPES = {CV, VOWEL, XVOWEL}
 
 # Two special characters that change the machine's behavior.
-WORD_BORDER = '|'      # word boundary, e.g. 子馬 = こ|うま = kouma, not kōma.
+WORD_BORDER = '|'         # word boundary, e.g. 子馬 = こ|うま = kouma, not kōma.
 PARTICLE_INDICATOR = '.'  # indicates a particle, e.g. わたし.は = watashi wa.
 
 
@@ -115,7 +127,6 @@ class KanaConv(object):
         self.active_vowel_ro = None
 
         # The currently active small vowel character.
-        self.has_xvowel = False
         self.active_xvowel_info = None
 
         # The currently active character.
@@ -124,10 +135,36 @@ class KanaConv(object):
 
         # The type of character; either a consonant-vowel pair or a vowel.
         self.active_char_type = None
+        # Information on digraph character parts.
+        self.active_digraph_a_info = None
+        self.active_digraph_b_info = None
+
+        # Whether the state has a small vowel or digraph second part.
+        self.has_xvowel = False
+        self.has_digraph_b = False
 
         # Reset the machine to a pristine state.
         self.empty_stack()
         self.set_state(EMPTY_BUFFER)
+
+    def set_state(self, state):
+        '''
+        Resets the machine to a specific base state.
+        '''
+        if state == EMPTY_BUFFER:
+            self.lvmarker_count = 0
+            self.geminate_count = 0
+            self.active_vowel_info = None
+            self.active_vowel_ro = None
+            self.active_xvowel_info = None
+            self.active_char = None
+            self.active_char_info = None
+            self.active_char_type = None
+            self.active_digraph_a_info = None
+            self.active_digraph_b_info = None
+            self.has_xvowel = False
+            self.has_digraph_b = False
+            self.unknown_chars = []
 
     def set_unknown_strategy(self, behavior):
         '''
@@ -159,6 +196,7 @@ class KanaConv(object):
         char_type = self.active_char_type
         char_ro = char_info[0]
         xv = self.active_xvowel_info
+        di_b = self.active_digraph_b_info
         gem = self.geminate_count
         lvm = self.lvmarker_count
 
@@ -168,7 +206,7 @@ class KanaConv(object):
 
         # If no modifiers are active (geminate marker, small vowel marker,
         # etc.) then just the currently active character is flushed.
-        if xv is None and gem == 0 and lvm == 0:
+        if xv is None and di_b is None and gem == 0 and lvm == 0:
             self.append_to_stack(char_ro)
             self.set_state(EMPTY_BUFFER)
             return
@@ -183,7 +221,6 @@ class KanaConv(object):
         # long vowel markers, which repeats the vowel part. If there's
         # at least one long vowel marker, we also use a macron vowel
         # rather than the regular one, e.g. 'ī' instead of 'i'.
-
         if char_type == CV:
             # Deconstruct the info object for clarity.
             char_gem_cons = char_info[1]  # the extra geminate consonant
@@ -194,19 +231,29 @@ class KanaConv(object):
             # arbitrarily long).
             gem_cons = char_gem_cons * gem
 
-            # If there's an active small vowel, integrate it with the consonant
-            # of the active character.
             if xv is not None:
                 # Combine the consonant of the character with the small vowel.
                 # Use a macron vowel if there's a long vowel marker,
                 # else use the regular vowel.
                 vowel = xv[1] * lvm if lvm > 0 else xv[0]
-                self.append_to_stack(gem_cons + char_cons + vowel)
+            elif di_b is not None:
+                # Put together the digraph. Here we produce the latter half
+                # of the digraph.
+                vowel = di_b[1] * lvm if lvm > 0 else di_b[0]
             else:
-                # Add either a character with macron if needed, or just
-                # the plain character.
+                # Neither a small vowel marker, nor a digraph.
+                vowel = ''
+
+            if vowel != '':
+                # If we've got a special vowel part, combine it with the
+                # main consonant.
+                char_main = char_cons + vowel
+            else:
+                # If not, process the main character and add the long vowels
+                # if applicable.
                 char_main = char_cons + char_lv * lvm if lvm > 0 else char_ro
-                self.append_to_stack(gem_cons + char_main)
+
+            self.append_to_stack(gem_cons + char_main)
 
         if char_type == VOWEL or char_type == XVOWEL:
             char_lv = char_info[1]  # the long vowel part
@@ -234,26 +281,31 @@ class KanaConv(object):
         self.stack.append(string)
 
     def get_unknown_chars(self):
+        '''
+        Returns all unknown characters in the stack as a string.
+        '''
         return ''.join(self.unknown_chars)
 
     def add_unknown_char(self, string):
+        '''
+        Adds an unknown character to the stack.
+        '''
         self.unknown_chars.append(string)
 
-    def set_state(self, state):
+    def set_digraph_a(self, char):
         '''
-        Resets the machine to a specific base state.
+        Sets the currently active character, in case it is (potentially)
+        the first part of a digraph.
         '''
-        if state == EMPTY_BUFFER:
-            self.lvmarker_count = 0
-            self.geminate_count = 0
-            self.active_vowel_info = None
-            self.active_vowel_ro = None
-            self.has_xvowel = False
-            self.active_xvowel_info = None
-            self.active_char = None
-            self.active_char_info = None
-            self.active_char_type = None
-            self.unknown_chars = []
+        self.active_digraph_a_info = di_a_lt[char]
+        self.set_char(char, CV)
+
+    def set_digraph_b(self, char):
+        '''
+        Sets the second part of a digraph.
+        '''
+        self.has_digraph_b = True
+        self.active_digraph_b_info = di_b_lt[char]
 
     def set_char(self, char, type):
         '''
@@ -312,7 +364,16 @@ class KanaConv(object):
         '''
         if self.has_xvowel is True:
             print('  has xvowel')
-            if self.active_xvowel_info[0] == self.active_vowel_ro:
+            vowel_info = self.active_xvowel_info
+        elif self.has_digraph_b is True:
+            print('  has digraph_b')
+            vowel_info = self.active_digraph_b_info
+        else:
+            vowel_info = None
+
+        if vowel_info is not None:
+            if vowel_info[0] == self.active_vowel_ro or \
+                vowel_info[0] == self.active_digraph_b_info[0]:
                 # Same vowel as the one that's currently active.
                 # todo: test
                 self.inc_lvmarker()
@@ -353,7 +414,7 @@ class KanaConv(object):
         output = ''.join(self.stack)
         self.set_state(EMPTY_BUFFER)
         self.empty_stack()
-        return output
+        return unicode(output)
 
     def to_romaji(self, input):
         '''
@@ -363,6 +424,15 @@ class KanaConv(object):
         chars.append(END_CHAR)
         for char in chars:
             print('char: %s' % char)
+            if char in di_a:
+                print('set_digraph_a(%s)' % (char))
+                self.set_digraph_a(char)
+                continue
+
+            if char in di_b:
+                print('set_digraph_b(%s)' % (char))
+                self.set_digraph_b(char)
+
             if char in cvs:
                 print('set_char(%s, %s)' % (char, CV))
                 self.set_char(char, CV)

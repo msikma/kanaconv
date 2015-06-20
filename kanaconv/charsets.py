@@ -53,12 +53,12 @@ katakana = {
         u'ァ', u'ィ', u'ゥ', u'ェ', u'ォ'
     ],
     # First characters of digraphs
-    'set_di1': [
+    'set_digraphs_a': [
         u'キ', u'シ', u'チ', u'ヒ', u'ミ', u'リ', u'ナ'
         u'ギ', u'ジ', u'ヂ', u'ビ', u'ミ', u'リ', u'ピ'
     ],
     # Second characters of digraphs
-    'set_di2': [
+    'set_digraphs_b': [
         u'ャ', u'ュ', u'ョ'
     ],
     # Geminate consonant marker（sukuon, 促音・そくおん）
@@ -85,8 +85,8 @@ hiragana = {
     'set_cvs': switch_charset(katakana['set_cvs'], HIRAGANA),
     'set_vowels': switch_charset(katakana['set_vowels'], HIRAGANA),
     'set_xvowels': switch_charset(katakana['set_xvowels'], HIRAGANA),
-    'set_di1': switch_charset(katakana['set_di1'], HIRAGANA),
-    'set_di2': switch_charset(katakana['set_di2'], HIRAGANA),
+    'set_digraphs_a': switch_charset(katakana['set_digraphs_a'], HIRAGANA),
+    'set_digraphs_b': switch_charset(katakana['set_digraphs_b'], HIRAGANA),
     # Geminate consonant marker（sukuon, 促音・そくおん）
     'geminate': u'っ',
     # The following characters are unique to the hiragana Unicode block.
@@ -179,13 +179,13 @@ romaji = {
     'repl_char': '-',
     # First characters of digraphs (only the consonants are needed)
     # todo: implement
-    'set_di1': [
+    'set_digraphs_a': [
         'ky', 'sh', 'ch', 'hy', 'my', 'ry', 'ny'
         'gy', 'j', 'dy', 'by', 'my', 'ry', 'py'
     ],
     # Second characters of digraphs
-    'set_di2': [
-        ('a', 'ā'), ('u', 'ū'), ('o', 'ō')
+    'set_digraphs_b': [
+        ('a', u'ā'), ('u', u'ū'), ('o', u'ō')
     ]
 }
 
