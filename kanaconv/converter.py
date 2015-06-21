@@ -122,7 +122,7 @@ class KanaConv(object):
         '''
         # What to do with unknown characters; either we delete them,
         # include them in the output, or raise an exception.
-        self.unknown_strategy = UNKNOWN_DELETE
+        self.unknown_strategy = UNKNOWN_INCLUDE
         self.unknown_chars = []
 
         # The character stack, containing the characters of the rōmaji output.
