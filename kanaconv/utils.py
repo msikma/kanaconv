@@ -54,8 +54,8 @@ def kana_romaji_lt(romaji, *kana):
 
     For the consonant-vowel (cv) characters, we'll generate:
 
-       {'か': ('ka', 'k', 'k', 'ā'),
-        'が': ('ga', 'g', 'g', 'ā'),
+       {u'か': ('ka', 'k', 'k', 'ā'),
+        u'が': ('ga', 'g', 'g', 'ā'),
         [...]
 
     Multiple kana character sets can be passed as rest arguments.
