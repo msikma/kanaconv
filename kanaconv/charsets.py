@@ -54,7 +54,7 @@ katakana = {
     ],
     # First characters of digraphs
     'set_digraphs_a': [
-        u'キ', u'シ', u'チ', u'ヒ', u'ミ', u'リ', u'ナ'
+        u'キ', u'シ', u'チ', u'ヒ', u'ミ', u'リ', u'ナ',
         u'ギ', u'ジ', u'ヂ', u'ビ', u'ミ', u'リ', u'ピ'
     ],
     # Second characters of digraphs
@@ -177,11 +177,12 @@ romaji = {
     ],
     # Replacement character for impossible geminate marker combinations
     'repl_char': '-',
+    # Apostrophe character that follows an 'n' before 'y' or a vowel.
+    'apostrophe_char': '\'',
     # First characters of digraphs (only the consonants are needed)
-    # todo: implement
     'set_digraphs_a': [
-        'ky', 'sh', 'ch', 'hy', 'my', 'ry', 'ny'
-        'gy', 'j', 'dy', 'by', 'my', 'ry', 'py'
+        ('ky',), ('sh',), ('ch',), ('hy',), ('my',), ('ry',), ('ny',),
+        ('gy',), ('j',), ('dy',), ('by',), ('my',), ('ry',), ('py',)
     ],
     # Second characters of digraphs
     'set_digraphs_b': [

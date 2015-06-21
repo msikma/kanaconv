@@ -32,7 +32,7 @@ with no plans to support them in the future:
 The theoretical combinations yi, ye and wu don't exist, nor does the
 repeater mark with handakuten.
 '''
-from kanaconv.utils import kana_romaji_lt
+from kanaconv.utils import kana_romaji_lt, merge_dicts
 from kanaconv.exceptions import (
     InvalidCharacterTypeError, UnexpectedCharacterError)
 from kanaconv.charsets import romaji, katakana, hiragana, lvmarker
@@ -56,6 +56,9 @@ xvowels_katakana = katakana['set_xvowels']
 xvowels_hiragana = hiragana['set_xvowels']
 xvowel_lt = kana_romaji_lt(xvowels_romaji, xvowels_katakana, xvowels_hiragana)
 
+# Global lookup table for all kana character types except the digraphs.
+kana_lt = merge_dicts(cv_lt, vowel_lt, xvowel_lt)
+
 # Lookup table for digraph kana.
 di_a_romaji = romaji['set_digraphs_a']
 di_b_romaji = romaji['set_digraphs_b']
@@ -74,12 +77,19 @@ di_a = set(di_a_lt)
 di_b = set(di_b_lt)
 geminates = {katakana['geminate'], hiragana['geminate']}
 
+# Character combinations that can become long vowels.
+lv_combinations = {('a', 'a'), ('u', 'u'), ('e', 'e'), ('o', 'o'), ('o', 'u')}
+
+# Characters that trigger an apostrophe after a lone 'n'.
+n_apostrophe = {'a', 'i', 'u', 'e', 'o', 'y'}
+
 # The machine's constants.
 EMPTY_BUFFER = 10
 END_CHAR = 11
 CV = 12
 VOWEL = 13
 XVOWEL = 14
+
 # Strategies for dealing with unknown characters.
 UNKNOWN_DELETE = 15
 UNKNOWN_RAISE = 16
@@ -88,6 +98,8 @@ UNKNOWN_INCLUDE = 17
 # The replacement character for impossible geminate marker combinations.
 # E.g. っえ becomes -e. todo: implement
 REPL_CHAR = romaji['repl_char']
+# The character that follows the 'n' before vowels and 'y'.
+APOSTROPHE_CHAR = romaji['apostrophe_char']
 
 # The valid character types.
 CHAR_TYPES = {CV, VOWEL, XVOWEL}
@@ -122,6 +134,10 @@ class KanaConv(object):
         # Number of geminate markers in the state.
         self.geminate_count = 0
 
+        # The character that will directly follow the flushed character.
+        self.next_char_info = None
+        self.next_char_type = None
+
         # The currently active rōmaji vowel character.
         self.active_vowel_info = None
         self.active_vowel_ro = None
@@ -135,6 +151,7 @@ class KanaConv(object):
 
         # The type of character; either a consonant-vowel pair or a vowel.
         self.active_char_type = None
+
         # Information on digraph character parts.
         self.active_digraph_a_info = None
         self.active_digraph_b_info = None
@@ -154,6 +171,8 @@ class KanaConv(object):
         if state == EMPTY_BUFFER:
             self.lvmarker_count = 0
             self.geminate_count = 0
+            self.next_char_info = None
+            self.next_char_type = None
             self.active_vowel_info = None
             self.active_vowel_ro = None
             self.active_xvowel_info = None
@@ -186,7 +205,7 @@ class KanaConv(object):
         ト, plus a geminate marker and a long vowel marker, this causes
         the characters "ttō" to be added to the output.
         '''
-        print('    flush char')
+        print('-------- flush char %s' % (repr(self.active_char_info)))
         if self.active_char is None:
             # Ignore in case there's no active character, only at the very
             # beginning of the conversion process.
@@ -206,7 +225,9 @@ class KanaConv(object):
 
         # If no modifiers are active (geminate marker, small vowel marker,
         # etc.) then just the currently active character is flushed.
-        if xv is None and di_b is None and gem == 0 and lvm == 0:
+        # We'll also continue if the character is 'n', which has a special
+        # case attached to it that we'll tackle down below.
+        if xv is di_b is None and gem == lvm == 0 and char_ro != 'n':
             self.append_to_stack(char_ro)
             self.set_state(EMPTY_BUFFER)
             return
@@ -221,11 +242,35 @@ class KanaConv(object):
         # long vowel markers, which repeats the vowel part. If there's
         # at least one long vowel marker, we also use a macron vowel
         # rather than the regular one, e.g. 'ī' instead of 'i'.
+
         if char_type == CV:
             # Deconstruct the info object for clarity.
             char_gem_cons = char_info[1]  # the extra geminate consonant
             char_cons = char_info[2]      # the consonant part
             char_lv = char_info[4]        # the long vowel part
+
+            # If this flushed character is an 'n', and precedes a vowel or
+            # a 'y' consonant, it must be followed by an apostrophe.
+            char_apostrophe = ''
+            if char_ro == 'n' and self.next_char_info is not None:
+                first_char = None
+
+                if self.next_char_type == CV:
+                    first_char = self.char_ro_consonant(self.next_char_info, CV)
+
+                if self.next_char_type == VOWEL or \
+                   self.next_char_type == XVOWEL:
+                    first_char = self.char_ro_vowel(self.next_char_info, VOWEL)
+
+                # If the following character is in the set of characters
+                # that should trigger an apostrophe, add it to the output.
+                if first_char in n_apostrophe:
+                    char_apostrophe = APOSTROPHE_CHAR
+
+            # Check to see if we've got a full digraph.
+            if self.active_digraph_a_info is not None and \
+               self.active_digraph_b_info is not None:
+                char_cons = self.active_digraph_a_info[0]
 
             # Determine the geminate consonant part (which can be
             # arbitrarily long).
@@ -247,11 +292,14 @@ class KanaConv(object):
             if vowel != '':
                 # If we've got a special vowel part, combine it with the
                 # main consonant.
-                char_main = char_cons + vowel
+                char_main = char_cons + char_apostrophe + vowel
             else:
                 # If not, process the main character and add the long vowels
                 # if applicable.
-                char_main = char_cons + char_lv * lvm if lvm > 0 else char_ro
+                if lvm > 0:
+                    char_main = char_cons + char_apostrophe + char_lv * lvm
+                else:
+                    char_main = char_ro + char_apostrophe
 
             self.append_to_stack(gem_cons + char_main)
 
@@ -277,7 +325,6 @@ class KanaConv(object):
         '''
         Appends a string to the output stack.
         '''
-        print('      append: %s' % string)
         self.stack.append(string)
 
     def get_unknown_chars(self):
@@ -297,15 +344,45 @@ class KanaConv(object):
         Sets the currently active character, in case it is (potentially)
         the first part of a digraph.
         '''
-        self.active_digraph_a_info = di_a_lt[char]
         self.set_char(char, CV)
+        self.active_digraph_a_info = di_a_lt[char]
 
     def set_digraph_b(self, char):
         '''
         Sets the second part of a digraph.
         '''
         self.has_digraph_b = True
+        # Change the active vowel to the one provided by the second part
+        # of the digraph.
+        self.active_vowel_ro = di_b_lt[char][0]
         self.active_digraph_b_info = di_b_lt[char]
+
+    def char_lookup(self, char):
+        '''
+        Retrieves a character's info from the lookup table.
+        '''
+        return kana_lt[char]
+
+    def char_ro_consonant(self, char_info, type):
+        '''
+        Returns the consonant part of a character in rōmaji.
+        '''
+        if type == CV:
+            return char_info[1]
+
+        return None
+
+    def char_ro_vowel(self, char_info, type):
+        '''
+        Returns the vowel part of a character in rōmaji.
+        '''
+        if type == CV:
+            return char_info[3]
+
+        if type == VOWEL or type == XVOWEL:
+            return char_info[0]
+
+        return None
 
     def set_char(self, char, type):
         '''
@@ -316,6 +393,8 @@ class KanaConv(object):
         We also set the character type: either a consonant-vowel pair
         or a vowel. This affects the way the character is flushed later.
         '''
+        self.next_char_info = self.char_lookup(char)
+        self.next_char_type = type
         self.flush_char()
 
         self.active_char = char
@@ -323,17 +402,16 @@ class KanaConv(object):
 
         print('  char: %s' % char)
 
-        if type == CV:
-            self.active_char_info = cv_lt[char]
-            self.active_vowel_ro = cv_lt[char][3]
+        self.active_char_info = self.char_lookup(char)
+        self.active_vowel_ro = self.char_ro_vowel(self.active_char_info, type)
 
-        if type == VOWEL:
-            self.active_char_info = vowel_lt[char]
-            self.active_vowel_ro = vowel_lt[char][0]
-
-        if type == XVOWEL:
-            self.active_char_info = xvowel_lt[char]
-            self.active_vowel_ro = xvowel_lt[char][0]
+    def is_long_vowel(self, vowel_ro_a, vowel_ro_b):
+        '''
+        Checks whether two rōmaji vowels combine to become a long vowel.
+        True for a + a, u + u, e + e, o + o, and o + u. The order of
+        arguments matters for the o + u combination.
+        '''
+        return (vowel_ro_a, vowel_ro_b) in lv_combinations
 
     def set_vowel(self, vowel):
         '''
@@ -346,7 +424,7 @@ class KanaConv(object):
         Hence, either we increment the long vowel marker count, or we
         flush the current character and set the active character to this.
         '''
-        if vowel_lt[vowel][0] == self.active_vowel_ro:
+        if self.is_long_vowel(self.active_vowel_ro, kana_lt[vowel][0]):
             # Same vowel as the one that's currently active.
             self.inc_lvmarker()
         else:
@@ -361,28 +439,49 @@ class KanaConv(object):
         dictionary words), the current character must be flushed. After that,
         we'll set the current character to this small vowel; in essence,
         it will act like a regular size vowel.
+
+        We'll check for digraphs too, just so e.g. しょ followed by ぉ acts
+        like a long vowel marker. This doesn't occur in dictionary words,
+        but it's the most sensible behavior for unusual input.
+
+        If the currently active character ends with the same vowel as this
+        small vowel, a long vowel marker is added instead.
+        E.g. テェ becomes 'tē'.
         '''
-        if self.has_xvowel is True:
-            print('  has xvowel')
+        xvowel_info = kana_lt[xvowel]
+        vowel_info = None
+
+        # Special case: if the currently active character is 'n', we must
+        # flush the character and set this small vowel as the active character.
+        # This is because small vowels cannot affect 'n' like regular
+        # consonant-vowel pairs.
+        curr_is_n = self.active_vowel_ro == 'n'
+
+        if self.active_vowel_ro == xvowel_info[0]:
+            # We have an active character whose vowel is the same.
+            self.inc_lvmarker()
+        elif self.has_xvowel is True or curr_is_n:
+            # We have an active small vowel already.
             vowel_info = self.active_xvowel_info
         elif self.has_digraph_b is True:
-            print('  has digraph_b')
+            # We have an active digraph (two parts).
             vowel_info = self.active_digraph_b_info
-        else:
-            vowel_info = None
+
+        if curr_is_n:
+            self.set_char(xvowel, XVOWEL)
+            return
 
         if vowel_info is not None:
-            if vowel_info[0] == self.active_vowel_ro or \
-                vowel_info[0] == self.active_digraph_b_info[0]:
+            if self.is_long_vowel(self.active_vowel_ro, vowel_info[0]) or \
+               self.is_long_vowel(self.active_digraph_b_info[0], vowel_info[0]):
                 # Same vowel as the one that's currently active.
-                # todo: test
                 self.inc_lvmarker()
             else:
                 # Not the same, so flush the active character and continue.
                 self.active_vowel_ro = self.active_xvowel_info[0]
                 self.set_char(xvowel, XVOWEL)
         else:
-            self.active_xvowel_info = xvowel_lt[xvowel]
+            self.active_xvowel_info = xvowel_info
 
         self.has_xvowel = True
 
@@ -423,7 +522,6 @@ class KanaConv(object):
         chars = list(input)
         chars.append(END_CHAR)
         for char in chars:
-            print('char: %s' % char)
             if char in di_a:
                 print('set_digraph_a(%s)' % (char))
                 self.set_digraph_a(char)

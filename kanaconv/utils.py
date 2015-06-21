@@ -47,6 +47,20 @@ def switch_charset(characters, target=''):
     return characters
 
 
+def merge_dicts(*dicts):
+    '''
+    Given any number of dicts, shallow copy and merge into a new dict,
+    precedence goes to key value pairs in latter dicts.
+
+    Taken from an answer by Aaron Hall on Stack Overflow:
+    <http://stackoverflow.com/a/26853961>.
+    '''
+    result = {}
+    for dictionary in dicts:
+        result.update(dictionary)
+    return result
+
+
 def kana_romaji_lt(romaji, *kana):
     '''
     Generates a lookup table with the kana characters on the left side
