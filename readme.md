@@ -12,9 +12,8 @@ For a full overview of the rules by which this module operates, see [the
 Wikipedia page on Hepburn romanization](https://en.wikipedia
 .org/wiki/Hepburn_romanization).
 
-The converter is built as a finite state machine and attempts to convert
-any input to a sensible output even if character combinations are used
-that don't normally occur in Japanese.
+The converter attempts to produce sensible output even when given unusual
+character combinations that don't normally occur in dictionary words.
 
 **Note, this package is not working properly yet. It's only at the initial few
 commits.**
