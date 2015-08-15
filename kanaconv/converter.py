@@ -32,6 +32,7 @@ with no plans to support them in the future:
 The theoretical combinations yi, ye and wu don't exist, nor does the
 repeater mark with handakuten.
 '''
+import sys
 from kanaconv.utils import kana_romaji_lt, merge_dicts
 from kanaconv.exceptions import (
     InvalidCharacterTypeError, UnexpectedCharacterError)
@@ -513,7 +514,10 @@ class KanaConv(object):
         output = ''.join(self.stack)
         self.set_state(EMPTY_BUFFER)
         self.empty_stack()
-        return unicode(output)
+        if sys.version_info < (3, 0):
+            return unicode(output)
+        else:
+            return output
 
     def to_romaji(self, input):
         '''

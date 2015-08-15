@@ -5,8 +5,12 @@
 '''
 Helper utilities to make processing easier.
 '''
+import sys
 from kanaconv.constants import KATAKANA, HIRAGANA
 
+# Set the correct code point function based on whether we're on Python 2 or 3.
+if sys.version_info < (3, 0):
+    chr = unichr
 
 # The start and end offsets of the hiragana and katakana Unicode blocks.
 # The ranges are inclusive.
@@ -35,12 +39,12 @@ def switch_charset(characters, target=''):
     # todo: better way to copy a list?
     characters = [] + characters
     offset = block_offset * offsets[target]['direction']
-    for n in xrange(len(characters)):
+    for n in range(len(characters)):
         chars = list(characters[n])
 
-        for m in xrange(len(chars)):
+        for m in range(len(chars)):
             char = chars[m]
-            chars[m] = unichr(ord(char) + offset)
+            chars[m] = chr(ord(char) + offset)
 
         characters[n] = ''.join(chars)
 
@@ -76,7 +80,7 @@ def kana_romaji_lt(romaji, *kana):
     '''
     lt = {}
     for kana_set in kana:
-        for n in xrange(len(romaji)):
+        for n in range(len(romaji)):
             ro = romaji[n]
             ka = kana_set[n]
             lt[ka] = ro
