@@ -23,11 +23,64 @@ tests_apostrophe = [
     (u'かんい', u'kan\'i')
 ]
 
+# Tests whether we're correctly running pre-processing transformations.
+# These take place before we run the regular transliteration algorithm.
+tests_preprocessing = [
+    # transform full-width rōmaji to standard Latin characters
+    (u'オールＡ', u'ōruA'),
+    (u'ＡＢＣＤＥＦＧＨＩ', u'ABCDEFGHI'),
+    (u'ＪＫＬＭＮＯＰＱＲ', u'JKLMNOPQR'),
+    (u'ＳＴＵＶＷＸＹＺ１', u'STUVWXYZ1'),
+    (u'２３４５６７８９０', u'234567890'),
+    (u'ａｂｃｄｅｆｇｈｉ', u'abcdefghi'),
+    (u'ｊｋｌｍｎｏｐｑｒ', u'jklmnopqr'),
+    (u'ｓｔｕｖｗｘｙｚ', u'stuvwxyz'),
+    # ヿ is a ligature for コト
+    (u'ヿ', u'koto'),
+    # unusual (non-existent?) combination but theoretically possible
+    (u'ヿー', u'kotō'),
+    # ゟ is a ligature for より
+    (u'えきゟ', u'ekiyori'),
+    # check the usage of the archaic repeater characters
+    (u'さゝき', u'sasaki'),
+    (u'あひゞき', u'ahibiki'),
+    # check the usage of the ゠ character (for dashes in proper names)
+    (u'ラッセル゠アインシュタイン', u'rasseru-einshutain'),
+    # check whether combining (han)dakuten characters are converted
+    (u'か\u3099か', u'gaka'),
+    (u'は\u309aは', u'paha')
+]
+
+# Tests for rare and (mostly) obsolete characters.
+tests_rare = [
+    # ウェ is preferred for 'we'
+    (u'ウェスト', u'wesuto'),
+    # ウィ is 'wi', and full-width rōmaji is transliterated into latin
+    (u'ウィンドウズＸＰ', u'windouzuXP'),
+    # ヴェ is used for 've'
+    (u'アヴェニュー', u'avenyū'),
+    # ヹ is sometimes (very rarely) used instead of ヴェ
+    (u'アヹ', u'ave'),
+    # ゑ is technically 'we', but is used as though it's 'e'
+    (u'ゑびす', u'ebisu'),
+    # ヱ is the katakana version of ゑ, and sometimes it's 'ye'
+    (u'ヱビス', u'ebisu'),
+    # ヰ is 'wi', for which ウイ or ウィ is now preferred
+    (u'スヰーデン', u'suwīden'),
+    # rare version of ウイスキー
+    (u'ヰスキー', u'wisukī'),
+    # archaic ligature for 'koto'
+    (u'スルヿ', u'surukoto'),
+    # small 'ka' and 'ke', though the katakana ヶ is pronounced as 'ka'
+    (u'ゕーゖーヵーヶー', u'kākēkākā')
+]
+
 # Tests whether the word border character, '|', correctly
 # prevents rōmaji long vowels from showing up.
 tests_word_border = [
     (u'ぬれ|えん', u'nureen'),
-    (u'ぬれえん', u'nurēn'),  # in case the separator is missing
+    # in case the separator is missing
+    (u'ぬれえん', u'nurēn'),
     (u'こ|おどり', u'koodori'),
     (u'まよ|う', u'mayou')
 ]
@@ -35,37 +88,43 @@ tests_word_border = [
 # Tests hiragana and katakana long vowels.
 tests_long_vowels = [
     (u'がっこう', u'gakkō'),
-    (u'きいろ', u'kiiro'),  # not kīro; i + i does not yield a long vowel
+    # not kīro; i + i does not yield a long vowel
+    (u'きいろ', u'kiiro'),
     (u'セーラー', u'sērā'),
     (u'おねえさん', u'onēsan'),
     (u'こおり', u'kōri'),
     (u'スーパーマン', u'sūpāman'),
     (u'とうきょう', u'tōkyō'),
     (u'パーティー', u'pātī'),
-    (u'く|う', u'kuu')  # the last 'u' is not converted to 'ū'
+    # the last 'u' is not converted to 'ū'
+    (u'く|う', u'kuu'),
+    (u'シーチキン', u'shīchikin')
 ]
 
 # Tests hiragana and katakana small vowels, including unusual
 # combinations.
 tests_xvowels = [
     (u'しょ', u'sho'),
-    # Some unusual combinations:
+    # チェ is used for 'che', which chiefly katakana
+    (u'チェコきょうわこく', u'chekokyouwakoku'),
+    # some unusual combinations:
     (u'ワァ', u'wā'),
     (u'ワァィ', u'wāi')
 ]
 
-# Tests the usage of a small ツ in front of チ.
+# Tests the usage of a small ッ in front of チ and ツ.
 tests_xtsu_chi = [
     (u'まっちゃ', u'matcha'),
     (u'ぼっちゃん', u'botchan'),
     (u'ボッチャン', u'botchan'),
-    (u'ボっチゃン', u'botchan'),  # mixture of hiragana and katakana
+    # mixture of hiragana and katakana
+    (u'ボっチゃン', u'botchan'),
     (u'こっち', u'kotchi')
 ]
 
 class TestKanaConv(unittest.TestCase):
     '''
-    Test case for the KanaConverter class that covers all implemented
+    Test case for the KanaConv class that covers all implemented
     conversion rules and checks whether all rare edge cases are
     correctly handled.
 
@@ -103,6 +162,12 @@ class TestKanaConv(unittest.TestCase):
 
     def test_xtsu_chi(self):
         self._run_tests(tests_xtsu_chi)
+
+    def test_rare(self):
+        self._run_tests(tests_rare)
+
+    def test_preprocessing(self):
+        self._run_tests(tests_preprocessing)
 
 if __name__ == '__main__':
     unittest.main()
