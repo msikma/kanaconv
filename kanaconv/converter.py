@@ -14,6 +14,7 @@ Aside from the usual kana, the following are supported:
    * Rare characters that are mostly for loanwords (ヺヸヷヴゔ)
    * The repeater characters（ゝゞヽヾ）
    * The yori and koto ligatures（ゟ・ヿ）
+   * Numerous punctuation and bracket characters (e.g. 【】「」・。, etc)
 
 Conversely, the following characters and features are not supported,
 with no plans to support them in the future:
