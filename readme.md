@@ -10,13 +10,14 @@ transliteration rules.**
 
 For a full overview of the rules by which this module operates, see [the
 Wikipedia page on Hepburn romanization](https://en.wikipedia
-.org/wiki/Hepburn_romanization).
+.org/wiki/Hepburn_romanization). In addition to Modified Hepburn, this module
+implements a commonsense way to handle some rare and uncommon edge cases
+(with some limitations; see below).
 
 The converter attempts to produce sensible output even when given unusual
 character combinations that don't normally occur in dictionary words.
 
-**Note, this package is not working properly yet. It's only at the initial few
-commits.**
+Compatible with Python 2.7 and 3.4.
 
 
 Examples
@@ -30,8 +31,8 @@ conv = KanaConv()
 
 conv.to_romaji(u'がっこう')　　　 # u'gakkō'
 conv.to_romaji(u'セーラー')　　　 # u'sērā'
-conv.to_romaji(u'おねえさん')　　 # u'onēsan',
-conv.to_romaji(u'こおり')　　　　 # u'kōri',
+conv.to_romaji(u'おねえさん')　　 # u'onēsan'
+conv.to_romaji(u'こおり')　　　　 # u'kōri'
 conv.to_romaji(u'スーパーマン')　 # u'sūpāman'
 conv.to_romaji(u'とうきょう')　　 # u'tōkyō'
 conv.to_romaji(u'パーティー')　　 # u'pātī'
@@ -45,10 +46,9 @@ Transliteration support
 Aside from basic hiragana and katakana, the following characters are supported:
 
 * The wi/we kana characters（ゐゑ・ヰヱ）
+* Rare characters that are mostly for loanwords (ヺヸヷヴゔ)
 * The repeater characters（ゝゞヽヾ）
-* The koto ligature（ヿ）
-* Small ka (ゕ; U+3095, and ヵ; U+30F5)
-* Small ke (ゖ; U+3096, and ヶ; U+30F6)
+* The yori and koto ligatures（ゟ・ヿ）
 * Numerous punctuation and bracket characters (e.g. 【】「」・。, etc)
 
 Conversely, the following characters and features are not supported,
@@ -77,8 +77,8 @@ transliteration is *kouma*.
 
 Since the module does not have an internal dictionary, it can't know that
 こうま is split across two words in such a way. In order to get a correct
-transliteration, you need to manually add a pipe character to the input,
-e.g. こ|うま:
+transliteration, you need to manually add a pipe character to the input
+to indicate the border, e.g. こ|うま:
 
 ```python
 # transliteration of 子馬
@@ -87,7 +87,9 @@ conv.to_romaji(u'こ|うま')　　　　# u'kouma' - correct
 ```
 
 This rule applies to the combinations *a + a*, *u + u*, *e + e*, *o + o*,
-and *o + u*. All other combinations of vowels are always written separately.
+and *o + u*. The *i + i* combination is written as *ii*, but an extended
+vowel due to a long vowel marker is written as *ī*. All other combinations
+of vowels are always written separately.
 
 ### Unicode blocks
 
@@ -138,12 +140,32 @@ The use of an internal dictionary to handle these word replacements is
 considered to be out of scope for this project. Additionally, proper names
 like Tōkyō are not capitalized for the same reason.
 
-### Unusual combinations and edge cases
+### Limitations (unusual combinations and edge cases)
 
 This module will attempt to create sensible output even in the case of
 unusual character combinations that normally don't occur in a dictionary.
+However, there's a limit to what we can infer from the kana alone.
 
-**TODO: add a good example here.**
+A number of cases are ambiguous, or can have a different preferred 
+romanization based on the word. They're sufficiently rare (most of these 
+have practically zero usage in dictionary words) that we've settled on a 
+single implementation.
+
+* ウォ is transliterated as 'wo', though it can represent 'vo' in rare words
+* ヴィ and ヸ are transliterated as 'vi', but could also be 'wi'
+* クヮ is transliterated as 'kuwa', though 'kwa' is also possible; in general,
+  ヮ behaves exactly like ワ
+* ゑ and ヱ are technically 'we', sometimes 'ye', but are pronounced and
+  transliterated as 'e'
+* ゐ is technically 'wi', but is pronounced and transliterated as 'i'
+* ヰ can be 'i', 'wi' or 'vi' depending on the word; we've settled on 'i'
+  in all cases
+* ゖ could theoretically be 'ke' in online speech, but it's the (nearly unused)
+  hiragana version of ヶ which is always 'ka', so it's considered 'ka' here
+  too
+
+If these behaviors need to be changed as per a real life example, feel free
+to send in a comment or a PR.
 
 
 License
