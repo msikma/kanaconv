@@ -146,9 +146,9 @@ This module will attempt to create sensible output even in the case of
 unusual character combinations that normally don't occur in a dictionary.
 However, there's a limit to what we can infer from the kana alone.
 
-A number of cases are ambiguous, or can have a different preferred 
-romanization based on the word. They're sufficiently rare (most of these 
-have practically zero usage in dictionary words) that we've settled on a 
+A number of cases are ambiguous, or can have a different preferred
+romanization based on the word. They're sufficiently rare (most of these
+have practically zero usage in dictionary words) that we've settled on a
 single implementation.
 
 * ウォ is transliterated as 'wo', though it can represent 'vo' in rare words
