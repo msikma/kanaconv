@@ -2300,7 +2300,7 @@ class TestSpeed(unittest.TestCase):
                 conv.to_romaji(test[0])
 
         attempts = 5
-        loops = 50
+        loops = 15
         time_result = min(timeit.Timer(perform_test).repeat(attempts, loops))
         conversions = len(tests_freq1000) * loops
         print('{loops} loops, best of {attempts}: {time:.5f} secs'.format(
