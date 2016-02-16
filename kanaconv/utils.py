@@ -1,6 +1,6 @@
 # coding=utf8
 #
-# (C) 2015, MIT License
+# (C) 2015-2016, MIT License
 
 '''
 Helper utilities to make processing easier.

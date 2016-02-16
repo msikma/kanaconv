@@ -1,6 +1,6 @@
 # coding=utf8
 #
-# (C) 2015, MIT License
+# (C) 2015-2016, MIT License
 
 '''
 The kana constants are defined here. This includes all hiragana and katakana

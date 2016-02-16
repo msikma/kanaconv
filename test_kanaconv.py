@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding=utf8
 #
-# (C) 2015, MIT License
+# (C) 2015-2016, MIT License
 
 import unittest
 import timeit
