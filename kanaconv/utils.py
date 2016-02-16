@@ -6,7 +6,7 @@
 Helper utilities to make processing easier.
 '''
 import sys
-from kanaconv.constants import KATAKANA, HIRAGANA
+from .constants import KATAKANA, HIRAGANA
 
 # Set the correct code point function based on whether we're on Python 2 or 3.
 if sys.version_info < (3, 0):

@@ -31,14 +31,14 @@ The theoretical combinations yi, ye and wu don't exist, nor does the
 repeater mark with handakuten.
 '''
 import sys
-from kanaconv.utils import kana_romaji_lt, merge_dicts, fw_romaji_lt
-from kanaconv.exceptions import (
+from .utils import kana_romaji_lt, merge_dicts, fw_romaji_lt
+from .exceptions import (
     InvalidCharacterTypeError, UnexpectedCharacterError
 )
-from kanaconv.charsets import (
+from .charsets import (
     romaji, katakana, hiragana, lvmarker, fw_romaji, punctuation
 )
-from kanaconv.constants import *
+from .constants import *
 
 
 # Lookup table for consonant-vowel (cv) kana and their rōmaji data.

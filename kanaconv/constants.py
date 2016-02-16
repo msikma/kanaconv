@@ -3,7 +3,7 @@
 # (C) 2015, MIT License
 
 '''
-asdf
+List of constants used in the library.
 '''
 __all__ = ['HIRAGANA', 'KATAKANA', 'ROMAJI', 'EMPTY_BUFFER', 'END_CHAR',
            'CV', 'VOWEL', 'XVOWEL', 'UNKNOWN_DELETE', 'UNKNOWN_RAISE',

@@ -13,8 +13,8 @@ characters mean and how they're meant to be used.
 
 Unicode ranges in this file are inclusive ranges.
 '''
-from kanaconv.constants import KATAKANA, HIRAGANA, ROMAJI
-from kanaconv.utils import switch_charset
+from .constants import KATAKANA, HIRAGANA, ROMAJI
+from .utils import switch_charset
 
 # For ease of processing, we've divided the kana characters into five sets.
 #

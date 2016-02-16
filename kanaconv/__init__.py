@@ -5,4 +5,4 @@
 '''
 Kana conversion module.
 '''
-#from kanaconv.converter import KanaConverter
+from .converter import KanaConv
