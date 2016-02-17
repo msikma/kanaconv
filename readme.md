@@ -2,7 +2,7 @@ KanaConv
 ========
 
 **Python module that converts hiragana and katakana to rōmaji according
-to Modified Hepburn transliteration rules.**
+to Modified Heburn transliteration rules.**
 
 <p align="center">
 とうきょう → tōkyō　　パーティー → pātī
@@ -44,12 +44,12 @@ through `kanaconv.KanaConv`.
 from kanaconv import KanaConv
 conv = KanaConv()
 
-conv.to_romaji('スーパーマン')　 # u'sūpāman'
-conv.to_romaji('こおり')　　　　 # u'kōri'
-conv.to_romaji('おねえさん')　　 # u'onēsan'
-conv.to_romaji('とうきょう')　　 # u'tōkyō'
-conv.to_romaji('パーティー')　　 # u'pātī'
-conv.to_romaji('ぬれ|えん')　　　# u'nureen' (濡れ縁; see section on word borders)
+conv.to_romaji('スーパーマン')　 # 'sūpāman'
+conv.to_romaji('こおり')　　　　 # 'kōri'
+conv.to_romaji('おねえさん')　　 # 'onēsan'
+conv.to_romaji('とうきょう')　　 # 'tōkyō'
+conv.to_romaji('パーティー')　　 # 'pātī'
+conv.to_romaji('こ|うま')　　　　# 'kouma' (子馬; see section on word borders)
 ```
 
 Note: just use `u'カタカナ'` when working with Python 2.7.
