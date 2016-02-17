@@ -20,24 +20,39 @@ character combinations that don't normally occur in dictionary words.
 Compatible with Python 2.7 and 3.4.
 
 
-Examples
---------
+Installation and usage
+----------------------
 
-Some example conversions are listed below:
+The easiest way to install this module is by using `pip`, e.g.:
+
+    $ pip install kanaconv
+This will allow you to use the command line utility:
+
+```
+$ kanaconv ウェスト
+wesuto
+$ kanaconv スーパーマン
+sūpāman
+$ kanaconv がっこう
+gakkō
+```
+
+If you're developing an application, the converter is available
+through `kanaconv.KanaConv`.
 
 ```python
 from kanaconv import KanaConv
 conv = KanaConv()
 
-conv.to_romaji(u'がっこう')　　　 # u'gakkō'
-conv.to_romaji(u'セーラー')　　　 # u'sērā'
-conv.to_romaji(u'おねえさん')　　 # u'onēsan'
-conv.to_romaji(u'こおり')　　　　 # u'kōri'
-conv.to_romaji(u'スーパーマン')　 # u'sūpāman'
-conv.to_romaji(u'とうきょう')　　 # u'tōkyō'
-conv.to_romaji(u'パーティー')　　 # u'pātī'
-conv.to_romaji(u'ぬれ|えん')　　　# u'nureen' (濡れ縁; see section on word borders)
+conv.to_romaji('スーパーマン')　 # u'sūpāman'
+conv.to_romaji('こおり')　　　　 # u'kōri'
+conv.to_romaji('おねえさん')　　 # u'onēsan'
+conv.to_romaji('とうきょう')　　 # u'tōkyō'
+conv.to_romaji('パーティー')　　 # u'pātī'
+conv.to_romaji('ぬれ|えん')　　　# u'nureen' (濡れ縁; see section on word borders)
 ```
+
+Note: just use `u'カタカナ'` when working with Python 2.7.
 
 
 Transliteration support
@@ -127,8 +142,7 @@ There are a number of other blocks for e.g. half-width characters and other
 rare glyphs, but none of them are supported.
 
 More info on the supported typographic symbols can be found
-[on the Wikipedia page for Japanese typographic symbols](https://en.wikipedia
-.org/wiki/Japanese_typographic_symbols).
+[on the Wikipedia page for Japanese typographic symbols](https://en.wikipedia.org/wiki/Japanese_typographic_symbols).
 
 ### Existing English terms
 
@@ -166,6 +180,18 @@ single implementation.
 
 If these behaviors need to be changed as per a real life example, feel free
 to send in a comment or a PR.
+
+
+Development
+-----------
+
+I'm always glad to accept pull requests or to look at issues or questions.
+
+### Tests
+
+Run `./setup.py test` to run the unit tests. An additional speed test
+is included as well, which you can run with
+`python -m kanaconv.tests.test_speed`.
 
 
 License
