@@ -1,8 +1,8 @@
 KanaConv
 ========
 
-**Converts hiragana and katakana to rōmaji according to Modified Hepburn
-transliteration rules.**
+**Python module that converts hiragana and katakana to rōmaji according
+to Modified Hepburn transliteration rules.**
 
 <p align="center">
 とうきょう → tōkyō　　パーティー → pātī
