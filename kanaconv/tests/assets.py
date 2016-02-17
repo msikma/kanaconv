@@ -1,14 +1,10 @@
-#!/usr/bin/env python
 # coding=utf8
 #
 # (C) 2015-2016, MIT License
 
-import unittest
-import timeit
-from math import trunc
-from kanaconv.converter import KanaConv
-
-
+'''
+Contains word lists for our tests.
+'''
 # Tests whether the 'n' before vowels and y is converted
 # to 'n\'' (including apostrophe).
 # In traditional Hepburn, the 'n' becomes an 'm' before labial consonants,
@@ -222,7 +218,6 @@ tests_xtsu_chi = [
     (u'こっち', u'kotchi'),
     (u'みっつ', u'mittsu'),
 ]
-
 
 # Tests the 1000 most frequent lemmas as determined by Wikipedia.
 # See the full list and more information here: <http://is.gd/SMXdY1>
@@ -2228,92 +2223,3 @@ tests_freq1000 = [
     # 1000. もと
     (u'もと', u'moto')
 ]
-
-
-class TestConverter(unittest.TestCase):
-    '''
-    Test case for the KanaConv class that covers all implemented
-    conversion rules and checks whether all rare edge cases are
-    correctly handled.
-
-    Every check is a simple string comparison between what the output
-    is expected to be, and what the output actually is.
-
-    To run: ./test_kanaconv.py TestConverter
-    '''
-    def setUp(self):
-        '''
-        Initialize the KanaConverter.
-        '''
-        self.conv = KanaConv()
-
-    def _run_tests(self, tests):
-        '''
-        Runs a series of assertEqual() tests.
-        '''
-        for test in tests:
-            output = self.conv.to_romaji(test[0])
-            with self.subTest(word=test[0]):
-                self.assertEqual(output, test[1])
-
-    def test_apostrophe(self):
-        self._run_tests(tests_apostrophe)
-
-    def test_word_border(self):
-        self._run_tests(tests_word_border)
-
-    def test_long_vowels(self):
-        self._run_tests(tests_long_vowels)
-
-    def test_xvowels(self):
-        self._run_tests(tests_xvowels)
-
-    def test_xtsu_chi(self):
-        self._run_tests(tests_xtsu_chi)
-
-    def test_rare_exc(self):
-        self._run_tests(tests_rare_exc)
-
-    def test_preprocessing(self):
-        self._run_tests(tests_preprocessing)
-
-    def test_freq1000(self):
-        self._run_tests(tests_freq1000)
-
-
-class TestSpeed(unittest.TestCase):
-    '''
-    Iterates over the largest test case (the 1000 most frequent lemmas
-    on Wikipedia) several times using timeit to get a representative
-    indication of the module's conversion speed.
-
-    To run: ./test_kanaconv.py TestSpeed
-    '''
-    def test_freq1000(self):
-        conv = KanaConv()
-
-        def perform_test():
-            '''
-            Runs the actual test. Isolated function for use with timeit.
-            '''
-            for test in tests_freq1000:
-                conv.to_romaji(test[0])
-
-        attempts = 5
-        loops = 15
-        time_result = min(timeit.Timer(perform_test).repeat(attempts, loops))
-        conversions = len(tests_freq1000) * loops
-        print('{loops} loops, best of {attempts}: {time:.5f} secs'.format(
-            loops=loops,
-            attempts=attempts,
-            time=time_result
-        ))
-        print('{conv} conversions, average of {avg:d} usec per '
-              'conversion'.format(
-            conv=conversions,
-            avg=trunc((time_result / conversions) * 1000000)
-        ))
-
-
-if __name__ == '__main__':
-    unittest.main()
