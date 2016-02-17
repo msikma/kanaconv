@@ -16,6 +16,7 @@ setup(
     author='Michiel Sikma',
     author_email='michiel@sikma.org',
     license='MIT',
+    test_suite='kanaconv.tests.test_kanaconv',
     packages=['kanaconv'],
     classifiers=[
         'Intended Audience :: Developers',
