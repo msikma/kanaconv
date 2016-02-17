@@ -36,10 +36,8 @@ See <{}> for more information.
     )
     argparser.add_argument(
         'str',
-        help='String to transliterate'
+        help='String to transliterate.'
     )
     args = argparser.parse_args()
-    from pprint import pprint
-    pprint(args)
     conv = KanaConv()
-    print(conv.to_romaji(u'アバカダブラ'))
+    print(conv.to_romaji(args.str))

@@ -3,5 +3,5 @@
 # (C) 2015-2016, MIT License
 
 '''
-Command-line interface for KanaConv.
+Container for command-line utilities.
 '''
