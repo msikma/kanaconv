@@ -6,7 +6,7 @@
 List of constants used in the library.
 '''
 __all__ = ['HIRAGANA', 'KATAKANA', 'ROMAJI', 'EMPTY_BUFFER', 'END_CHAR',
-           'CV', 'VOWEL', 'XVOWEL', 'UNKNOWN_DELETE', 'UNKNOWN_RAISE',
+           'CV', 'VOWEL', 'XVOWEL', 'UNKNOWN_DISCARD', 'UNKNOWN_RAISE',
            'UNKNOWN_INCLUDE']
 
 HIRAGANA = 10
@@ -21,6 +21,6 @@ VOWEL = 16
 XVOWEL = 17
 
 # Strategies for dealing with unknown characters.
-UNKNOWN_DELETE = 18
+UNKNOWN_DISCARD = 18
 UNKNOWN_RAISE = 19
 UNKNOWN_INCLUDE = 20

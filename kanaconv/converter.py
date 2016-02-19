@@ -136,7 +136,7 @@ class KanaConv(object):
 
         Also see the set_state() function.
         '''
-        # What to do with unknown characters; either we delete them,
+        # What to do with unknown characters; either we discard them,
         # include them in the output, or raise an exception.
         self.unknown_strategy = UNKNOWN_INCLUDE
         self.unknown_char = None
@@ -751,7 +751,7 @@ class KanaConv(object):
 
             # If we're still here, that means we've stumbled upon a character
             # the machine can't deal with.
-            if self.unknown_strategy == UNKNOWN_DELETE:
+            if self.unknown_strategy == UNKNOWN_DISCARD:
                 continue
 
             if self.unknown_strategy == UNKNOWN_RAISE:
