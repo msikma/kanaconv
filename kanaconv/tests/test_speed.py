@@ -9,6 +9,9 @@ from math import trunc
 from kanaconv.converter import KanaConv
 from .assets import tests_freq1000
 
+LOOPS_FEEDBACK = '{loops} loops, best of {attempts}: {time:.5f} secs'
+CONV_FEEDBACK = '{conv} conversions, average of {avg:d} usec per conversion'
+
 
 class TestSpeed(unittest.TestCase):
     '''
@@ -32,13 +35,12 @@ class TestSpeed(unittest.TestCase):
         loops = 15
         time_result = min(timeit.Timer(perform_test).repeat(attempts, loops))
         conversions = len(tests_freq1000) * loops
-        print('{loops} loops, best of {attempts}: {time:.5f} secs'.format(
+        print(LOOPS_FEEDBACK.format(
             loops=loops,
             attempts=attempts,
             time=time_result
         ))
-        print('{conv} conversions, average of {avg:d} usec per '
-              'conversion'.format(
+        print(CONV_FEEDBACK.format(
             conv=conversions,
             avg=trunc((time_result / conversions) * 1000000)
         ))

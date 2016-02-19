@@ -68,6 +68,7 @@ def _switch_charset_dict(characters, target=''):
 
     return offset_characters
 
+
 def _switch_charset_list(characters, target=''):
     '''
     Switches the character set of a list. If a character does not have

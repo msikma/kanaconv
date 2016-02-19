@@ -16,7 +16,8 @@ PACKAGE = pkg_resources.require('kanaconv')[0]
 def main():
     argparser = argparse.ArgumentParser(add_help=False)
     argparser.description = '''\
-Converts hiragana and katakana to rōmaji according to Modified Hepburn transliteration rules.
+Converts hiragana and katakana to rōmaji according to Modified Hepburn \
+transliteration rules.
 '''
     argparser.epilog = '''\
 See <{}> for more information.

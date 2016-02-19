@@ -174,8 +174,8 @@ class KanaConv(object):
         self.active_char_type = None
 
         # Information on digraph character parts.
-        self.active_digraph_a_info = None
-        self.active_digraph_b_info = None
+        self.active_dgr_a_info = None
+        self.active_dgr_b_info = None
 
         # Whether the state has a small vowel or digraph second part.
         self.has_xvowel = False
@@ -201,8 +201,8 @@ class KanaConv(object):
             self.active_char = None
             self.active_char_info = None
             self.active_char_type = None
-            self.active_digraph_a_info = None
-            self.active_digraph_b_info = None
+            self.active_dgr_a_info = None
+            self.active_dgr_b_info = None
             self.has_xvowel = False
             self.has_digraph_b = False
             self.has_u_lvm = False
@@ -252,7 +252,7 @@ class KanaConv(object):
         char_type = self.active_char_type
         char_ro = char_info[0]
         xv = self.active_xvowel_info
-        di_b = self.active_digraph_b_info
+        di_b = self.active_dgr_b_info
         gem = self.geminate_count
         lvm = self.lvmarker_count
 
@@ -310,7 +310,7 @@ class KanaConv(object):
                 first_char = None
 
                 if self.next_char_type == CV:
-                    first_char = self.char_ro_consonant(self.next_char_info, CV)
+                    first_char = self.char_ro_cons(self.next_char_info, CV)
 
                 if self.next_char_type == VOWEL or \
                    self.next_char_type == XVOWEL:
@@ -322,9 +322,9 @@ class KanaConv(object):
                     char_apostrophe = APOSTROPHE_CHAR
 
             # Check to see if we've got a full digraph.
-            if self.active_digraph_a_info is not None and \
-               self.active_digraph_b_info is not None:
-                char_cons = self.active_digraph_a_info[0]
+            if self.active_dgr_a_info is not None and \
+               self.active_dgr_b_info is not None:
+                char_cons = self.active_dgr_a_info[0]
 
             # Determine the geminate consonant part (which can be
             # arbitrarily long).
@@ -390,7 +390,7 @@ class KanaConv(object):
         the first part of a digraph.
         '''
         self.set_char(char, CV)
-        self.active_digraph_a_info = di_a_lt[char]
+        self.active_dgr_a_info = di_a_lt[char]
 
     def set_digraph_b(self, char):
         '''
@@ -400,7 +400,7 @@ class KanaConv(object):
         # Change the active vowel to the one provided by the second part
         # of the digraph.
         self.active_vowel_ro = di_b_lt[char][0]
-        self.active_digraph_b_info = di_b_lt[char]
+        self.active_dgr_b_info = di_b_lt[char]
 
     def char_lookup(self, char):
         '''
@@ -408,7 +408,7 @@ class KanaConv(object):
         '''
         return kana_lt[char]
 
-    def char_ro_consonant(self, char_info, type):
+    def char_ro_cons(self, char_info, type):
         '''
         Returns the consonant part of a character in rōmaji.
         '''
@@ -509,7 +509,7 @@ class KanaConv(object):
         '''
         xvowel_info = kana_lt[xvowel]
         vowel_info = self.active_vowel_info
-        digraph_b_info = None
+        dgr_b_info = None
 
         # Special case: if the currently active character is 'n', we must
         # flush the character and set this small vowel as the active character.
@@ -551,16 +551,15 @@ class KanaConv(object):
             return
         elif self.has_digraph_b is True:
             # We have an active digraph (two parts).
-            digraph_b_info = self.active_digraph_b_info
+            dgr_b_info = self.active_dgr_b_info
 
         if curr_is_n:
             self.set_char(xvowel, XVOWEL)
             return
 
-        if digraph_b_info is not None:
-            # todo: too long!
-            if self.is_long_vowel(self.active_vowel_ro, digraph_b_info[0]) or \
-               self.is_long_vowel(self.active_digraph_b_info[0], digraph_b_info[0]):
+        if dgr_b_info is not None:
+            if self.is_long_vowel(self.active_vowel_ro, dgr_b_info[0]) or \
+               self.is_long_vowel(self.active_dgr_b_info[0], dgr_b_info[0]):
                 # Same vowel as the one that's currently active.
                 self.inc_lvmarker()
             else:
