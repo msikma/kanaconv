@@ -6,3 +6,5 @@
 Kana conversion module.
 '''
 from .converter import KanaConv
+
+__all__ = ['KanaConv']

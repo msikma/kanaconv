@@ -41,7 +41,7 @@ from .charsets import (
     punct_spacing, preprocess_chars
 )
 from .constants import (
-    CV, XVOWEL, VOWEL, EMPTY_BUFFER, END_CHAR, UNKNOWN_DISCARD, UNKNOWN_RAISE,
+    CV, XVOWEL, VOWEL, END_CHAR, UNKNOWN_DISCARD, UNKNOWN_RAISE,
     UNKNOWN_INCLUDE
 )
 
@@ -186,33 +186,33 @@ class KanaConv(object):
         self.has_xvowel = False
         self.has_digraph_b = False
 
-        # Reset the machine to a pristine state.
-        self.empty_stack()
-        self.set_state(EMPTY_BUFFER)
+        # Make the machine ready to accept the first character.
+        self._empty_stack()
+        self._clear_char()
 
-    def set_state(self, state):
+    def _clear_char(self):
         '''
-        Resets the machine to a specific base state.
+        Clears the current character and makes the machine ready
+        to accept the next character.
         '''
-        if state == EMPTY_BUFFER:
-            self.lvmarker_count = 0
-            self.geminate_count = 0
-            self.next_char_info = None
-            self.next_char_type = None
-            self.active_vowel = None
-            self.active_vowel_info = None
-            self.active_vowel_ro = None
-            self.active_xvowel = None
-            self.active_xvowel_info = None
-            self.active_char = None
-            self.active_char_info = None
-            self.active_char_type = None
-            self.active_dgr_a_info = None
-            self.active_dgr_b_info = None
-            self.has_xvowel = False
-            self.has_digraph_b = False
-            self.has_u_lvm = False
-            self.unknown_char = None
+        self.lvmarker_count = 0
+        self.geminate_count = 0
+        self.next_char_info = None
+        self.next_char_type = None
+        self.active_vowel = None
+        self.active_vowel_info = None
+        self.active_vowel_ro = None
+        self.active_xvowel = None
+        self.active_xvowel_info = None
+        self.active_char = None
+        self.active_char_info = None
+        self.active_char_type = None
+        self.active_dgr_a_info = None
+        self.active_dgr_b_info = None
+        self.has_xvowel = False
+        self.has_digraph_b = False
+        self.has_u_lvm = False
+        self.unknown_char = None
 
     def set_unknown_strategy(self, behavior):
         '''
@@ -220,7 +220,7 @@ class KanaConv(object):
         '''
         self.unknown_strategy = behavior
 
-    def empty_stack(self):
+    def _empty_stack(self):
         '''
         Empties the stack, making the converter ready for the next
         transliteration job. Performed once after we finish one string of
@@ -228,17 +228,17 @@ class KanaConv(object):
         '''
         self.stack = []
 
-    def append_unknown_char(self):
+    def _append_unknown_char(self):
         '''
         Appends the unknown character, in case one was encountered.
         '''
         if self.unknown_strategy == UNKNOWN_INCLUDE and \
            self.unknown_char is not None:
-            self.append_to_stack(self.unknown_char)
+            self._append_to_stack(self.unknown_char)
 
         self.unknown_char = None
 
-    def flush_char(self):
+    def _flush_char(self):
         '''
         Appends the rōmaji characters that represent the current state
         of the machine. For example, if the state includes the character
@@ -249,7 +249,7 @@ class KanaConv(object):
         # first iteration of the conversion process.
         if self.active_char is None:
             if self.unknown_char is not None:
-                self.append_unknown_char()
+                self._append_unknown_char()
 
             return
 
@@ -285,9 +285,9 @@ class KanaConv(object):
         # We'll also continue if the character is 'n', which has a special
         # case attached to it that we'll tackle down below.
         if xv is di_b is None and gem == lvm == 0 and char_ro != 'n':
-            self.append_to_stack(char_ro)
-            self.append_unknown_char()
-            self.set_state(EMPTY_BUFFER)
+            self._append_to_stack(char_ro)
+            self._append_unknown_char()
+            self._clear_char()
             return
 
         # At this point, we're considering two main factors: the currently
@@ -315,11 +315,17 @@ class KanaConv(object):
                 first_char = None
 
                 if self.next_char_type == CV:
-                    first_char = self.char_ro_cons(self.next_char_info, CV)
+                    first_char = self._char_ro_cons(
+                        self.next_char_info,
+                        CV
+                    )
 
                 if self.next_char_type == VOWEL or \
                    self.next_char_type == XVOWEL:
-                    first_char = self.char_ro_vowel(self.next_char_info, VOWEL)
+                    first_char = self._char_ro_vowel(
+                        self.next_char_info,
+                        VOWEL
+                    )
 
                 # If the following character is in the set of characters
                 # that should trigger an apostrophe, add it to the output.
@@ -360,29 +366,29 @@ class KanaConv(object):
                 else:
                     char_main = char_ro + char_apostrophe
 
-            self.append_to_stack(gem_cons + char_main)
+            self._append_to_stack(gem_cons + char_main)
 
         if char_type == VOWEL or char_type == XVOWEL:
             char_lv = char_info[1]  # the long vowel part
 
             if xv is not None:
                 xv_ro = xv[1] * lvm if lvm > 0 else xv[0]
-                self.append_to_stack(char_ro + xv_ro)
+                self._append_to_stack(char_ro + xv_ro)
             else:
                 vowel_ro = char_lv * lvm if lvm > 0 else char_ro
-                self.append_to_stack(vowel_ro)
+                self._append_to_stack(vowel_ro)
 
         # Append unknown the character as well.
-        self.append_unknown_char()
-        self.set_state(EMPTY_BUFFER)
+        self._append_unknown_char()
+        self._clear_char()
 
-    def append_to_stack(self, string):
+    def _append_to_stack(self, string):
         '''
         Appends a string to the output stack.
         '''
         self.stack.append(string)
 
-    def promote_solitary_xvowel(self):
+    def _promote_solitary_xvowel(self):
         '''
         "Promotes" the current xvowel to a regular vowel, in case
         it is not otherwise connected to a character.
@@ -397,31 +403,31 @@ class KanaConv(object):
         if char_type == VOWEL or char_type == CV or self.active_xvowel is None:
             return
 
-        self.set_char(self.active_xvowel, XVOWEL)
+        self._set_char(self.active_xvowel, XVOWEL)
         self.active_xvowel = None
         self.active_xvowel_info = None
 
-    def add_unknown_char(self, string):
+    def _add_unknown_char(self, string):
         '''
         Adds an unknown character to the stack.
         '''
         if self.has_xvowel:
             # Ensure an xvowel gets printed if we've got an active
             # one right now.
-            self.promote_solitary_xvowel()
+            self._promote_solitary_xvowel()
 
         self.unknown_char = string
-        self.flush_char()
+        self._flush_char()
 
-    def set_digraph_a(self, char):
+    def _set_digraph_a(self, char):
         '''
         Sets the currently active character, in case it is (potentially)
         the first part of a digraph.
         '''
-        self.set_char(char, CV)
+        self._set_char(char, CV)
         self.active_dgr_a_info = di_a_lt[char]
 
-    def set_digraph_b(self, char):
+    def _set_digraph_b(self, char):
         '''
         Sets the second part of a digraph.
         '''
@@ -431,13 +437,13 @@ class KanaConv(object):
         self.active_vowel_ro = di_b_lt[char][0]
         self.active_dgr_b_info = di_b_lt[char]
 
-    def char_lookup(self, char):
+    def _char_lookup(self, char):
         '''
         Retrieves a character's info from the lookup table.
         '''
         return kana_lt[char]
 
-    def char_ro_cons(self, char_info, type):
+    def _char_ro_cons(self, char_info, type):
         '''
         Returns the consonant part of a character in rōmaji.
         '''
@@ -446,7 +452,7 @@ class KanaConv(object):
 
         return None
 
-    def char_ro_vowel(self, char_info, type):
+    def _char_ro_vowel(self, char_info, type):
         '''
         Returns the vowel part of a character in rōmaji.
         '''
@@ -458,7 +464,7 @@ class KanaConv(object):
 
         return None
 
-    def set_char(self, char, type):
+    def _set_char(self, char, type):
         '''
         Sets the currently active character, e.g. ト. We save some information
         about the character as well. active_char_info contains the full
@@ -467,17 +473,17 @@ class KanaConv(object):
         We also set the character type: either a consonant-vowel pair
         or a vowel. This affects the way the character is flushed later.
         '''
-        self.next_char_info = self.char_lookup(char)
+        self.next_char_info = self._char_lookup(char)
         self.next_char_type = type
-        self.flush_char()
+        self._flush_char()
 
         self.active_char = char
         self.active_char_type = type
 
-        self.active_char_info = self.char_lookup(char)
-        self.active_vowel_ro = self.char_ro_vowel(self.active_char_info, type)
+        self.active_char_info = self._char_lookup(char)
+        self.active_vowel_ro = self._char_ro_vowel(self.active_char_info, type)
 
-    def is_long_vowel(self, vowel_ro_a, vowel_ro_b):
+    def _is_long_vowel(self, vowel_ro_a, vowel_ro_b):
         '''
         Checks whether two rōmaji vowels combine to become a long vowel.
         True for a + a, u + u, e + e, o + o, and o + u. The order of
@@ -485,7 +491,7 @@ class KanaConv(object):
         '''
         return (vowel_ro_a, vowel_ro_b) in lv_combinations
 
-    def set_vowel(self, vowel):
+    def _set_vowel(self, vowel):
         '''
         Sets the currently active vowel, e.g. ア.
 
@@ -504,22 +510,22 @@ class KanaConv(object):
         vowel_info = kana_lt[vowel]
         vowel_ro = self.active_vowel_ro
 
-        if self.is_long_vowel(vowel_ro, vowel_info[0]):
+        if self._is_long_vowel(vowel_ro, vowel_info[0]):
             # Check to see if the current vowel is ウ. If so,
             # we might need to backtrack later on in case the 'u'
             # turns into 'w' when ウ is coupled with a small vowel.
             if vowel_ro == 'u':
                 self.has_u_lvm = True
 
-            self.inc_lvmarker()
+            self._inc_lvmarker()
         else:
             # Not the same, so flush the active character and continue.
-            self.set_char(vowel, VOWEL)
+            self._set_char(vowel, VOWEL)
 
         self.active_vowel_info = vowel_info
         self.active_vowel = vowel
 
-    def set_xvowel(self, xvowel):
+    def _set_xvowel(self, xvowel):
         '''
         Sets the currently active small vowel, e.g. ァ.
 
@@ -560,58 +566,58 @@ class KanaConv(object):
            vowel_info[2]['xv'].get(xvowel_info[0]) is not None:
             # Decrement the long vowel marker, which was added on the
             # assumption that the 'u' is a vowel.
-            self.dec_lvmarker()
+            self._dec_lvmarker()
             # Save the current vowel. We'll flush the current character,
             # without this vowel, and then set it again from a clean slate.
             former_vowel = self.active_vowel
             self.active_vowel_info = None
-            self.flush_char()
-            self.set_char(former_vowel, VOWEL)
+            self._flush_char()
+            self._set_char(former_vowel, VOWEL)
 
         if self.active_vowel_ro == xvowel_info[0]:
             # We have an active character whose vowel is the same.
-            self.inc_lvmarker()
+            self._inc_lvmarker()
         elif self.has_xvowel is True:
             # We have an active small vowel already. Flush the current
             # character and act as though the current small vowel
             # is a regular vowel.
-            self.flush_char()
-            self.set_char(xvowel, XVOWEL)
+            self._flush_char()
+            self._set_char(xvowel, XVOWEL)
             return
         elif self.has_digraph_b is True:
             # We have an active digraph (two parts).
             dgr_b_info = self.active_dgr_b_info
 
         if curr_is_n:
-            self.set_char(xvowel, XVOWEL)
+            self._set_char(xvowel, XVOWEL)
             return
 
         if dgr_b_info is not None:
-            if self.is_long_vowel(self.active_vowel_ro, dgr_b_info[0]) or \
-               self.is_long_vowel(self.active_dgr_b_info[0], dgr_b_info[0]):
+            if self._is_long_vowel(self.active_vowel_ro, dgr_b_info[0]) or \
+               self._is_long_vowel(self.active_dgr_b_info[0], dgr_b_info[0]):
                 # Same vowel as the one that's currently active.
-                self.inc_lvmarker()
+                self._inc_lvmarker()
             else:
                 # Not the same, so flush the active character and continue.
                 self.active_vowel_ro = self.active_xvowel_info[0]
-                self.set_char(xvowel, XVOWEL)
+                self._set_char(xvowel, XVOWEL)
         else:
             self.active_xvowel = xvowel
             self.active_xvowel_info = xvowel_info
 
         self.has_xvowel = True
 
-    def inc_geminate(self):
+    def _inc_geminate(self):
         '''
         Increments the geminate marker count. Unless no active character
         has been set, this causes the current character to be flushed.
         '''
         if self.active_char is not None:
-            self.flush_char()
+            self._flush_char()
 
         self.geminate_count += 1
 
-    def inc_lvmarker(self):
+    def _inc_lvmarker(self):
         '''
         Increments the long vowel marker count.
         '''
@@ -622,7 +628,7 @@ class KanaConv(object):
 
         self.lvmarker_count += 1
 
-    def dec_lvmarker(self):
+    def _dec_lvmarker(self):
         '''
         Decrements the long vowel marker count, unless it would become
         a negative value.
@@ -632,20 +638,20 @@ class KanaConv(object):
 
         self.lvmarker_count -= 1
 
-    def flush_stack(self):
+    def _flush_stack(self):
         '''
         Returns the final output and resets the machine's state.
         '''
         output = ''.join(self.stack)
-        self.set_state(EMPTY_BUFFER)
-        self.empty_stack()
+        self._clear_char()
+        self._empty_stack()
 
         if not PYTHON_2:
             return output
         else:
             return unicode(output)
 
-    def preprocess_input(self, input):
+    def _preprocess_input(self, input):
         '''
         Preprocesses the input before it's split into a list.
         '''
@@ -653,34 +659,33 @@ class KanaConv(object):
             # No characters that we need to preprocess, so continue without.
             return input
 
-        input = self.add_punctuation_spacing(input)
-
-        for repl in punct_spacing:
-            input = re.sub(repl[0], repl[1], input)
+        input = self._add_punctuation_spacing(input)
 
         return input
 
-    def preprocess_chars(self, chars):
+    def _preprocess_chars(self, chars):
         '''
         Performs string preprocessing before the main conversion algorithm
         is used. Simple string replacements (for example, fullwidth rōmaji
         to regular rōmaji) are performed at this point.
         '''
-        chars = self.normalize_dakuten(chars)
-        chars = self.process_repeaters(chars)
-        chars = self.perform_replacements(chars)
+        chars = self._normalize_dakuten(chars)
+        chars = self._process_repeaters(chars)
+        chars = self._perform_replacements(chars)
 
         return chars
 
-    def add_punctuation_spacing(self, input):
+    def _add_punctuation_spacing(self, input):
         '''
         Adds additional spacing to punctuation characters. For example,
         this puts an extra space after a fullwidth full stop.
         '''
+        for replacement in punct_spacing:
+            input = re.sub(replacement[0], replacement[1], input)
 
         return input
 
-    def perform_replacements(self, chars):
+    def _perform_replacements(self, chars):
         '''
         Performs simple key/value string replacements that require no logic.
         This is used to convert the fullwidth rōmaji, several ligatures,
@@ -696,7 +701,7 @@ class KanaConv(object):
         # of single characters for iteration.
         return list(''.join(chars))
 
-    def normalize_dakuten(self, chars):
+    def _normalize_dakuten(self, chars):
         '''
         Replaces the dakuten and handakuten modifier character combinations
         with single characters. For example, か\u3099か becomes がけ,
@@ -727,7 +732,7 @@ class KanaConv(object):
         # just added. (This could use (0).__ne__, but that's Python 3 only.)
         return list(filter(lambda x: x is not 0, chars))
 
-    def process_repeaters(self, chars):
+    def _process_repeaters(self, chars):
         '''
         Replace all repeater characters (e.g. turn サヾエ into サザエ).
         '''
@@ -755,52 +760,52 @@ class KanaConv(object):
         '''
         Converts kana input to rōmaji and returns the result.
         '''
-        input = self.preprocess_input(input)
+        input = self._preprocess_input(input)
 
         # Preprocess the input, making string replacements where needed.
         chars = list(input)
-        chars = self.preprocess_chars(chars)
+        chars = self._preprocess_chars(chars)
 
         chars.append(END_CHAR)
         for char in chars:
             if char in di_a:
-                self.set_digraph_a(char)
+                self._set_digraph_a(char)
                 continue
 
             if char in di_b:
-                self.set_digraph_b(char)
+                self._set_digraph_b(char)
                 continue
 
             if char in cvs:
-                self.set_char(char, CV)
+                self._set_char(char, CV)
                 continue
 
             if char in vowels:
-                self.set_vowel(char)
+                self._set_vowel(char)
                 continue
 
             if char in xvowels:
-                self.set_xvowel(char)
+                self._set_xvowel(char)
                 continue
 
             if char in geminates:
-                self.inc_geminate()
+                self._inc_geminate()
                 continue
 
             if char == lvmarker:
-                self.inc_lvmarker()
+                self._inc_lvmarker()
                 continue
 
             if char == WORD_BORDER:
                 # When stumbling upon a word border, e.g. in ぬれ|えん,
                 # the current word has finished, meaning the character
                 # should be flushed.
-                self.flush_char()
+                self._flush_char()
                 continue
 
             if char == END_CHAR:
-                self.promote_solitary_xvowel()
-                self.flush_char()
+                self._promote_solitary_xvowel()
+                self._flush_char()
                 continue
 
             # If we're still here, that means we've stumbled upon a character
@@ -813,6 +818,6 @@ class KanaConv(object):
 
             if self.unknown_strategy == UNKNOWN_INCLUDE:
                 # The default strategy.
-                self.add_unknown_char(char)
+                self._add_unknown_char(char)
 
-        return self.flush_stack()
+        return self._flush_stack()

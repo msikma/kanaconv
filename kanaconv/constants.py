@@ -5,16 +5,17 @@
 '''
 List of constants used in the library.
 '''
-__all__ = ['HIRAGANA', 'KATAKANA', 'ROMAJI', 'EMPTY_BUFFER', 'END_CHAR',
-           'CV', 'VOWEL', 'XVOWEL', 'UNKNOWN_DISCARD', 'UNKNOWN_RAISE',
-           'UNKNOWN_INCLUDE']
+__all__ = [
+    'HIRAGANA', 'KATAKANA', 'ROMAJI', 'EMPTY_BUFFER', 'END_CHAR',
+    'CV', 'VOWEL', 'XVOWEL', 'UNKNOWN_DISCARD', 'UNKNOWN_RAISE',
+    'UNKNOWN_INCLUDE'
+]
 
 HIRAGANA = 10
 KATAKANA = 11
 ROMAJI = 12
 
 # The machine's constants.
-EMPTY_BUFFER = 13
 END_CHAR = 14
 CV = 15
 VOWEL = 16
