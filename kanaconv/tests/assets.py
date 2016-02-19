@@ -73,6 +73,7 @@ tests_preprocessing = [
     (u'わ＝あ', u'wa=a'),
     (u'ソン＂あ＂ソン', u'son "a" son'),
     (u'ソン＇あ＇ソン', u'son \'a\' son'),
+    (u'ソン＂あソン', u'son " ason'),
     (u'わ，あ', u'wa, a'),
     (u'わ　あ', u'wa a'),
     (u'わ｀あ', u'wa`a'),
@@ -83,11 +84,20 @@ tests_preprocessing = [
     (u'わ〜あ', u'wa~a'),
     (u'わ：あ', u'wa: a'),
     (u'わ；あ', u'wa; a'),
+    (u'わ：：あ', u'wa:: a'),
+    (u'わ；；あ', u'wa;; a'),
     (u'わ！？あ', u'wa!? a'),
     (u'わ。あ', u'wa. a'),
+    (u'わ！。あ', u'wa!. a'),
+    (u'わ？！。あ', u'wa?!. a'),
+    (u'わ？！。。あ', u'wa?!.. a'),
+    (u'わ。？！。。あ', u'wa.?!.. a'),
     (u'わ．あ', u'wa. a'),
     (u'わ‥あ', u'wa..a'),
-    (u'マイケル・シクマ', u'maikeru shikuma')
+    (u'マイケル・シクマ', u'maikeru shikuma'),
+    # some combinations with unknown characters
+    (u'わぁわぁ]', u'wāwā]'),
+    (u'いぁいぁ]', u'iaia]')
 ]
 
 # Tests for rare and (mostly) obsolete characters and special combinations.

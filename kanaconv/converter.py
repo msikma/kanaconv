@@ -31,15 +31,19 @@ The theoretical combinations yi, ye and wu don't exist, nor does the
 repeater mark with handakuten.
 '''
 import sys
+import re
 from .utils import kana_romaji_lt, merge_dicts, fw_romaji_lt
 from .exceptions import (
     InvalidCharacterTypeError, UnexpectedCharacterError
 )
 from .charsets import (
-    romaji, katakana, hiragana, lvmarker, fw_romaji, punctuation
+    romaji, katakana, hiragana, lvmarker, fw_romaji, punctuation,
+    punct_spacing, preprocess_chars
 )
-from .constants import *
-
+from .constants import (
+    CV, XVOWEL, VOWEL, EMPTY_BUFFER, END_CHAR, UNKNOWN_DISCARD, UNKNOWN_RAISE,
+    UNKNOWN_INCLUDE
+)
 
 # Lookup table for consonant-vowel (cv) kana and their rōmaji data.
 cvs_romaji = romaji['set_cvs']
@@ -164,6 +168,7 @@ class KanaConv(object):
         self.active_vowel_ro = None
 
         # The currently active small vowel character.
+        self.active_xvowel = None
         self.active_xvowel_info = None
 
         # The currently active character.
@@ -197,6 +202,7 @@ class KanaConv(object):
             self.active_vowel = None
             self.active_vowel_info = None
             self.active_vowel_ro = None
+            self.active_xvowel = None
             self.active_xvowel_info = None
             self.active_char = None
             self.active_char_info = None
@@ -242,7 +248,6 @@ class KanaConv(object):
         # Ignore in case there's no active character, only at the
         # first iteration of the conversion process.
         if self.active_char is None:
-            # Only exception is if we've got an unknown character.
             if self.unknown_char is not None:
                 self.append_unknown_char()
 
@@ -377,10 +382,34 @@ class KanaConv(object):
         '''
         self.stack.append(string)
 
+    def promote_solitary_xvowel(self):
+        '''
+        "Promotes" the current xvowel to a regular vowel, in case
+        it is not otherwise connected to a character.
+        Used to print small vowels that would otherwise get lost;
+        normally small vowels always form a pair, but in case one is
+        by itself it should basically act like a regular vowel.
+        '''
+        char_type = self.active_char_type
+
+        # Only promote if we actually have an xvowel, and if the currently
+        # active character is not a consonant-vowel pair or vowel.
+        if char_type == VOWEL or char_type == CV or self.active_xvowel is None:
+            return
+
+        self.set_char(self.active_xvowel, XVOWEL)
+        self.active_xvowel = None
+        self.active_xvowel_info = None
+
     def add_unknown_char(self, string):
         '''
         Adds an unknown character to the stack.
         '''
+        if self.has_xvowel:
+            # Ensure an xvowel gets printed if we've got an active
+            # one right now.
+            self.promote_solitary_xvowel()
+
         self.unknown_char = string
         self.flush_char()
 
@@ -567,6 +596,7 @@ class KanaConv(object):
                 self.active_vowel_ro = self.active_xvowel_info[0]
                 self.set_char(xvowel, XVOWEL)
         else:
+            self.active_xvowel = xvowel
             self.active_xvowel_info = xvowel_info
 
         self.has_xvowel = True
@@ -615,7 +645,22 @@ class KanaConv(object):
         else:
             return unicode(output)
 
-    def preprocess(self, chars):
+    def preprocess_input(self, input):
+        '''
+        Preprocesses the input before it's split into a list.
+        '''
+        if not re.search(preprocess_chars, input):
+            # No characters that we need to preprocess, so continue without.
+            return input
+
+        input = self.add_punctuation_spacing(input)
+
+        for repl in punct_spacing:
+            input = re.sub(repl[0], repl[1], input)
+
+        return input
+
+    def preprocess_chars(self, chars):
         '''
         Performs string preprocessing before the main conversion algorithm
         is used. Simple string replacements (for example, fullwidth rōmaji
@@ -626,6 +671,14 @@ class KanaConv(object):
         chars = self.perform_replacements(chars)
 
         return chars
+
+    def add_punctuation_spacing(self, input):
+        '''
+        Adds additional spacing to punctuation characters. For example,
+        this puts an extra space after a fullwidth full stop.
+        '''
+
+        return input
 
     def perform_replacements(self, chars):
         '''
@@ -702,10 +755,11 @@ class KanaConv(object):
         '''
         Converts kana input to rōmaji and returns the result.
         '''
-        chars = list(input)
+        input = self.preprocess_input(input)
 
         # Preprocess the input, making string replacements where needed.
-        chars = self.preprocess(chars)
+        chars = list(input)
+        chars = self.preprocess_chars(chars)
 
         chars.append(END_CHAR)
         for char in chars:
@@ -745,6 +799,7 @@ class KanaConv(object):
                 continue
 
             if char == END_CHAR:
+                self.promote_solitary_xvowel()
                 self.flush_char()
                 continue
 

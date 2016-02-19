@@ -66,7 +66,7 @@ katakana = {
     ],
     # Geminate consonant marker（sukuon, 促音・そくおん）
     'geminate': u'ッ',
-    # String replacements.
+    # String replacements
     'replacements': {
         # Special ligature for koto (コト), generally used in vertical writing
         u'ヿ': u'コト',
@@ -79,7 +79,7 @@ katakana = {
     # with the latter adding a dakuten
     'repeater': u'ヽ',            # サヽキ = ササキ
     'repeater_dakuten': u'ヾ',    # サヾエ = サザエ
-    # List of characters that can have a regular dakuten.
+    # List of characters that can have a regular dakuten
     'dakutenize': {
         u'カ': u'ガ', u'キ': u'ギ', u'ク': u'グ', u'ケ': u'ゲ', u'コ': u'ゴ',
         u'サ': u'ザ', u'シ': u'ジ', u'ス': u'ズ', u'セ': u'ゼ', u'ソ': u'ゾ',
@@ -87,7 +87,7 @@ katakana = {
         u'ハ': u'バ', u'ヒ': u'ビ', u'フ': u'ブ', u'ヘ': u'ベ', u'ホ': u'ボ',
         u'ヱ': u'ヹ', u'ウ': u'ヴ'
     },
-    # List of characters that can have a handakuten.
+    # List of characters that can have a handakuten
     'handakutenize': {
         u'ハ': u'パ', u'ヒ': u'ピ', u'フ': u'プ', u'ヘ': u'ペ', u'ホ': u'ポ'
     }
@@ -97,7 +97,7 @@ katakana = {
 # Range: U+3041 - U+3092
 hiragana = {
     'type': HIRAGANA,
-    # The hiragana sets, which are the converted versions of the katakana sets.
+    # The hiragana sets, which are the converted versions of the katakana sets
     'set_cvs': switch_charset(katakana['set_cvs'], HIRAGANA),
     'set_vowels': switch_charset(katakana['set_vowels'], HIRAGANA),
     'set_xvowels': switch_charset(katakana['set_xvowels'], HIRAGANA),
@@ -112,7 +112,7 @@ hiragana = {
     'handakuten': u'\u309a',      # combining: ぱは (U+306F U+309A U+306F)
     'spacing_dakuten': u'゛',     # non-combining: か゛か (U+304B U+309B U+304B)
     'spacing_handakuten': u'゜',  # non-combining: は゜は (U+306B U+309C U+306F)
-    # String replacements.
+    # String replacements
     'replacements': {
         # Special ligature for yori (より)
         u'ゟ': u'より',
@@ -122,7 +122,7 @@ hiragana = {
     # with the latter adding a dakuten
     'repeater': u'ゝ',            # さゝき = ささき
     'repeater_dakuten': u'ゞ',    # あひゞき = あひびき
-    # Lists of characters that can have dakuten.
+    # Lists of characters that can have dakuten
     'dakutenize': switch_charset(katakana['dakutenize'], HIRAGANA),
     'handakutenize': switch_charset(katakana['handakutenize'], HIRAGANA)
 }
@@ -208,7 +208,7 @@ romaji = {
     ],
     # Replacement character for impossible geminate marker combinations
     'repl_char': '-',
-    # Apostrophe character that follows an 'n' before 'y' or a vowel.
+    # Apostrophe character that follows an 'n' before 'y' or a vowel
     'apostrophe_char': '\'',
     # First characters of digraphs (only the consonants are needed)
     'set_digraphs_a': [
@@ -301,22 +301,36 @@ punctuation = {
     # Fullwidth tilde（nami dasshu, 波ダッシュ・なみダッシュ; "wave dash"）
     u'〜': u'~',
     # Fullwidth colon（コロン）
-    u'：': u': ',
+    u'：': u':',
     # Fullwidth semicolon
-    u'；': u'; ',
+    u'；': u';',
     # Fullwidth exclamation mark（kantanfu, 感嘆符・かんたんふ）
-    u'！': u'! ',
+    u'！': u'!',
     # Fullwidth question mark (hatena mark, はてなマーク)
-    u'？': u'? ',
-    # Ideographic fullstop
-    u'。': u'. ',
+    u'？': u'?',
+    # Ideographic full stop
+    u'。': u'.',
     # Fullwidth full stop
-    u'．': u'. ',
+    u'．': u'.',
     # Two-dot ellipsis
     u'‥': u'..',
     # Middle dot – used to break up words, especially foreign names
     u'・': u' '
 }
+
+# These are transforms that are applied to the source string
+# prior to further processing. This is used to get the spacing
+# right, for example after a fullwidth exclamation mark.
+punct_spacing = [
+    # Spacing for question mark, exclamation mark and full stops, etc
+    (u'([？！。．；：]+)', u'\\1 '),
+    # Spacing for quotation marks
+    (u'([＂＇])(.+?)([＂＇])', u' \\1\\2\\3 '),
+    (u'([\S])([＂＇])([\S])', u'\\1 \\2 \\3'),
+]
+
+# Regex to check for punctuation that requires preprocessing.
+preprocess_chars = '[！？。．；：＂＇]'
 
 # Long vowel marker (chōuon, 長音・ちょうおん)
 lvmarker = u'ー'
