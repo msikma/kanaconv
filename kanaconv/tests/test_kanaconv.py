@@ -20,7 +20,7 @@ class TestConverter(unittest.TestCase):
     Every check is a simple string comparison between what the output
     is expected to be, and what the output actually is.
 
-    To run: ./test_kanaconv.py TestConverter
+    Run this using ./setup.py test
     '''
     def setUp(self):
         '''
