@@ -1,6 +1,8 @@
 KanaConv
 ========
 
+[![PyPI version](https://badge.fury.io/py/kanaconv.svg)](https://pypi.python.org/pypi/kanaconv)
+
 **Python module that converts hiragana and katakana to rōmaji according
 to Modified Heburn transliteration rules.**
 
@@ -26,6 +28,7 @@ Installation and usage
 The easiest way to install this module is by using `pip`, e.g.:
 
     $ pip install kanaconv
+
 This will allow you to use the command line utility:
 
 ```
