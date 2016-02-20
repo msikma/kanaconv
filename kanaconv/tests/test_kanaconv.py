@@ -2,6 +2,7 @@
 #
 # (C) 2015-2016, MIT License
 
+import sys
 import unittest
 from kanaconv.converter import KanaConv
 from kanaconv.constants import MACRON_STYLE, CIRCUMFLEX_STYLE
@@ -11,6 +12,9 @@ from .assets import (
     tests_long_vowels, tests_xvowels, tests_xtsu_chi, tests_freq1000,
     tests_circumflex, tests_circumflex_uppercase, tests_long_vowels_uppercase
 )
+
+# Disables the subtest functionality if we're on Python 2.
+PYTHON_2 = sys.version_info < (3, 0)
 
 
 class TestConverter(unittest.TestCase):
@@ -37,9 +41,14 @@ class TestConverter(unittest.TestCase):
         self.conv.set_vowel_style(vowel_style)
         self.conv.set_uppercase(uppercase)
 
-        for test in tests:
-            output = self.conv.to_romaji(test[0])
-            with self.subTest(word=test[0]):
+        if not PYTHON_2:
+            for test in tests:
+                output = self.conv.to_romaji(test[0])
+                with self.subTest(word=test[0]):
+                    self.assertEqual(output, test[1])
+        else:
+            for test in tests:
+                output = self.conv.to_romaji(test[0])
                 self.assertEqual(output, test[1])
 
     def test_apostrophe(self):

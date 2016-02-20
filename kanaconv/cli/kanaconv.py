@@ -6,12 +6,14 @@
 '''
 Command-line helper tool to do kana conversions.
 '''
+import sys
 import argparse
 import pkg_resources
 from ..converter import KanaConv
 from ..constants import CIRCUMFLEX_STYLE
 
 PACKAGE = pkg_resources.require('kanaconv')[0]
+PYTHON_2 = sys.version_info < (3, 0)
 
 
 def main():
@@ -61,4 +63,9 @@ See <{}> for more information.
     if args.uppercase:
         conv.set_uppercase(True)
 
-    print(conv.to_romaji(args.str))
+    if not PYTHON_2:
+        input_str = args.str
+    else:
+        input_str = args.str.decode('utf-8')
+
+    print(conv.to_romaji(input_str))

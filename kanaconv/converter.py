@@ -669,7 +669,12 @@ class KanaConv(object):
         '''
         # Replace long vowels with circumflex characters.
         if self.vowel_style == CIRCUMFLEX_STYLE:
-            output = output.translate(vowels_to_circumflexes)
+            try:
+                output = output.translate(vowels_to_circumflexes)
+            except TypeError:
+                # Python 2 will error out here if there are no
+                # macron characters in the string to begin with.
+                pass
 
         # Output the desired case.
         if self.uppercase:
