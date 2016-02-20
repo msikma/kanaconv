@@ -11,8 +11,10 @@ from setuptools import setup
 setup(
     name='kanaconv',
     version='1.0.0',
-    description='Converts hiragana and katakana to rōmaji according to '
-                'Modified Hepburn transliteration rules',
+    description=(
+        'Converts hiragana and katakana to rōmaji according to '
+        'Modified Hepburn transliteration rules'
+    ),
     author='Michiel Sikma',
     author_email='michiel@sikma.org',
     license='MIT',
