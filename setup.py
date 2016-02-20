@@ -33,5 +33,5 @@ setup(
             'kanaconv=kanaconv.cli.kanaconv:main'
         ]
     },
-    zip_safe=False
+    zip_safe=True
 )
