@@ -10,7 +10,7 @@ from setuptools import setup
 
 setup(
     name='kanaconv',
-    version='1.0.0',
+    version='1.0.1',
     description=(
         'Converts hiragana and katakana to rōmaji according to '
         'Modified Hepburn transliteration rules'
