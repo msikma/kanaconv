@@ -155,6 +155,9 @@ class KanaConv(object):
         # Long vowel style, either with macron (ā) or with circumflex (â).
         self.vowel_style = MACRON_STYLE
 
+        # The case of the final output.
+        self.uppercase = False
+
         # The character stack, containing the characters of the rōmaji output.
         self.stack = []
 
@@ -235,6 +238,12 @@ class KanaConv(object):
         Sets the vowel style to either use macrons or circumflexes.
         '''
         self.vowel_style = style
+
+    def set_uppercase(self, state=True):
+        '''
+        Sets the output to appear either as lowercase or as uppercase.
+        '''
+        self.uppercase = state
 
     def _empty_stack(self):
         '''
@@ -661,6 +670,10 @@ class KanaConv(object):
         # Replace long vowels with circumflex characters.
         if self.vowel_style == CIRCUMFLEX_STYLE:
             output = output.translate(vowels_to_circumflexes)
+
+        # Output the desired case.
+        if self.uppercase:
+            output = output.upper()
 
         return output
 

@@ -23,7 +23,16 @@ tests_circumflex = [
     (u'ウィンドウズＸＰ', u'windôzuXP'),
     (u'ヌーヺー', u'nûvô'),
     (u'シャー', u'shâ'),
-    (u'セーラー', u'sêrâ'),
+    (u'セーラー', u'sêrâ')
+]
+tests_circumflex_uppercase = [
+    (u'オールＡ', u'ÔRUA'),
+    (u'えきゟー', u'EKIYORÎ'),
+    (u'リーヴァル', u'RÎVARU'),
+    (u'ウィンドウズＸＰ', u'WINDÔZUXP'),
+    (u'ヌーヺー', u'NÛVÔ'),
+    (u'シャー', u'SHÂ'),
+    (u'セーラー', u'SÊRÂ')
 ]
 
 # Tests whether we're correctly running pre-processing transformations.
@@ -207,6 +216,12 @@ tests_long_vowels = [
     (u'パーティー', u'pātī'),
     (u'シーチキン', u'shīchikin'),
     (u'メロディー', u'merodī')
+]
+tests_long_vowels_uppercase = [
+    (u'がっこう', u'GAKKŌ'),
+    (u'セーラー', u'SĒRĀ'),
+    (u'パーティー', u'PĀTĪ'),
+    (u'スーパーマン', u'SŪPĀMAN')
 ]
 
 # Tests hiragana and katakana small vowels, including unusual

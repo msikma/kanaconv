@@ -9,7 +9,7 @@ from kanaconv.constants import MACRON_STYLE, CIRCUMFLEX_STYLE
 from .assets import (
     tests_apostrophe, tests_preprocessing, tests_rare_exc, tests_word_border,
     tests_long_vowels, tests_xvowels, tests_xtsu_chi, tests_freq1000,
-    tests_circumflex
+    tests_circumflex, tests_circumflex_uppercase, tests_long_vowels_uppercase
 )
 
 
@@ -30,11 +30,12 @@ class TestConverter(unittest.TestCase):
         '''
         self.conv = KanaConv()
 
-    def _run_tests(self, tests, vowel_style=MACRON_STYLE):
+    def _run_tests(self, tests, vowel_style=MACRON_STYLE, uppercase=False):
         '''
         Runs a series of assertEqual() tests.
         '''
         self.conv.set_vowel_style(vowel_style)
+        self.conv.set_uppercase(uppercase)
 
         for test in tests:
             output = self.conv.to_romaji(test[0])
@@ -65,9 +66,16 @@ class TestConverter(unittest.TestCase):
     def test_freq1000(self):
         self._run_tests(tests_freq1000)
 
+    def test_uppercase(self):
+        self._run_tests(tests_long_vowels_uppercase, uppercase=True)
+
     def test_circumflex(self):
         self._run_tests(tests_circumflex, vowel_style=CIRCUMFLEX_STYLE)
-
+        self._run_tests(
+            tests_circumflex_uppercase,
+            vowel_style=CIRCUMFLEX_STYLE,
+            uppercase=True
+        )
 
 if __name__ == '__main__':
     unittest.main()

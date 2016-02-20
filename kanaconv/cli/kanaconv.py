@@ -43,6 +43,11 @@ See <{}> for more information.
              'the default macron (ā).'
     )
     argparser.add_argument(
+        '--uppercase',
+        action='store_true',
+        help='Returns uppercase string.'
+    )
+    argparser.add_argument(
         'str',
         help='String to transliterate.'
     )
@@ -52,5 +57,8 @@ See <{}> for more information.
 
     if args.circumflex:
         conv.set_vowel_style(CIRCUMFLEX_STYLE)
+
+    if args.uppercase:
+        conv.set_uppercase(True)
 
     print(conv.to_romaji(args.str))
