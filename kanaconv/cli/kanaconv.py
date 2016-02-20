@@ -45,7 +45,7 @@ See <{}> for more information.
     argparser.add_argument(
         '--uppercase',
         action='store_true',
-        help='Returns uppercase string.'
+        help='Changes the output to uppercase.'
     )
     argparser.add_argument(
         'str',
