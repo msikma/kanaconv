@@ -15,6 +15,7 @@ setup(
         'Converts hiragana and katakana to rōmaji according to '
         'Modified Hepburn transliteration rules'
     ),
+    url='https://github.com/msikma/kanaconv',
     author='Michiel Sikma',
     author_email='michiel@sikma.org',
     license='MIT',
