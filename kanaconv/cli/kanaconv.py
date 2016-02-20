@@ -9,6 +9,7 @@ Command-line helper tool to do kana conversions.
 import argparse
 import pkg_resources
 from ..converter import KanaConv
+from ..constants import CIRCUMFLEX_STYLE
 
 PACKAGE = pkg_resources.require('kanaconv')[0]
 
@@ -36,9 +37,20 @@ See <{}> for more information.
         help='Show version number and exit.'
     )
     argparser.add_argument(
+        '--circumflex',
+        action='store_true',
+        help='Whether to use circumflex (â) accents instead of '
+             'the default macron (ā).'
+    )
+    argparser.add_argument(
         'str',
         help='String to transliterate.'
     )
     args = argparser.parse_args()
+
     conv = KanaConv()
+
+    if args.circumflex:
+        conv.set_vowel_style(CIRCUMFLEX_STYLE)
+
     print(conv.to_romaji(args.str))

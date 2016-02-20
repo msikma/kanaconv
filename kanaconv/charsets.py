@@ -334,3 +334,7 @@ preprocess_chars = u'[！？。．；：＂＇]'
 
 # Long vowel marker (chōuon, 長音・ちょうおん)
 lvmarker = u'ー'
+
+# Two long vowel styles: macrons (the default) and circumflexes.
+macron_vowels = u'āīūēō'
+circumflex_vowels = u'âîûêô'

@@ -15,6 +15,17 @@ tests_apostrophe = [
     (u'ぐんま', u'gunma')
 ]
 
+# Tests the use of circumflex characters.
+tests_circumflex = [
+    (u'オールＡ', u'ôruA'),
+    (u'えきゟー', u'ekiyorî'),
+    (u'リーヴァル', u'rîvaru'),
+    (u'ウィンドウズＸＰ', u'windôzuXP'),
+    (u'ヌーヺー', u'nûvô'),
+    (u'シャー', u'shâ'),
+    (u'セーラー', u'sêrâ'),
+]
+
 # Tests whether we're correctly running pre-processing transformations.
 # These take place before we run the regular transliteration algorithm.
 tests_preprocessing = [

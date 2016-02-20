@@ -38,11 +38,11 @@ from .exceptions import (
 )
 from .charsets import (
     romaji, katakana, hiragana, lvmarker, fw_romaji, punctuation,
-    punct_spacing, preprocess_chars
+    punct_spacing, preprocess_chars, macron_vowels, circumflex_vowels
 )
 from .constants import (
     CV, XVOWEL, VOWEL, END_CHAR, UNKNOWN_DISCARD, UNKNOWN_RAISE,
-    UNKNOWN_INCLUDE
+    UNKNOWN_INCLUDE, MACRON_STYLE, CIRCUMFLEX_STYLE
 )
 
 # Lookup table for consonant-vowel (cv) kana and their rōmaji data.
@@ -112,6 +112,16 @@ lv_combinations = {('a', 'a'), ('u', 'u'), ('e', 'e'), ('o', 'o'), ('o', 'u')}
 # Characters that trigger an apostrophe after a lone 'n'.
 n_apostrophe = {'a', 'i', 'u', 'e', 'o', 'y'}
 
+# Whether we're on Python 2--used for some legacy compatibility code.
+PYTHON_2 = sys.version_info < (3, 0)
+
+# Translation table for macron to circumflex style long vowels.
+if not PYTHON_2:
+    vowels_to_circumflexes = str.maketrans(macron_vowels, circumflex_vowels)
+else:
+    macron_vowels_ord = [ord(char) for char in macron_vowels]
+    vowels_to_circumflexes = dict(zip(macron_vowels_ord, circumflex_vowels))
+
 # The replacement character for impossible geminate marker combinations.
 # E.g. っえ becomes -e. todo: implement
 REPL_CHAR = romaji['repl_char']
@@ -124,9 +134,6 @@ CHAR_TYPES = {CV, VOWEL, XVOWEL}
 # Two special characters that change the machine's behavior.
 WORD_BORDER = '|'         # word boundary, e.g. 子馬 = こ|うま = kouma, not kōma.
 PARTICLE_INDICATOR = '.'  # indicates a particle, e.g. わたし.は = watashi wa.
-
-# Whether we're on Python 2--used for some legacy compatibility code.
-PYTHON_2 = sys.version_info < (3, 0)
 
 
 class KanaConv(object):
@@ -144,6 +151,9 @@ class KanaConv(object):
         # include them in the output, or raise an exception.
         self.unknown_strategy = UNKNOWN_INCLUDE
         self.unknown_char = None
+
+        # Long vowel style, either with macron (ā) or with circumflex (â).
+        self.vowel_style = MACRON_STYLE
 
         # The character stack, containing the characters of the rōmaji output.
         self.stack = []
@@ -219,6 +229,12 @@ class KanaConv(object):
         Sets the strategy for dealing with unknown characters.
         '''
         self.unknown_strategy = behavior
+
+    def set_vowel_style(self, style):
+        '''
+        Sets the vowel style to either use macrons or circumflexes.
+        '''
+        self.vowel_style = style
 
     def _empty_stack(self):
         '''
@@ -638,11 +654,21 @@ class KanaConv(object):
 
         self.lvmarker_count -= 1
 
+    def _postprocess_output(self, output):
+        '''
+        Performs the last modifications before the output is returned.
+        '''
+        # Replace long vowels with circumflex characters.
+        if self.vowel_style == CIRCUMFLEX_STYLE:
+            output = output.translate(vowels_to_circumflexes)
+
+        return output
+
     def _flush_stack(self):
         '''
         Returns the final output and resets the machine's state.
         '''
-        output = ''.join(self.stack)
+        output = self._postprocess_output(''.join(self.stack))
         self._clear_char()
         self._empty_stack()
 
