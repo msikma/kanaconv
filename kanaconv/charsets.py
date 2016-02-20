@@ -330,7 +330,7 @@ punct_spacing = [
 ]
 
 # Regex to check for punctuation that requires preprocessing.
-preprocess_chars = '[！？。．；：＂＇]'
+preprocess_chars = u'[！？。．；：＂＇]'
 
 # Long vowel marker (chōuon, 長音・ちょうおん)
 lvmarker = u'ー'
